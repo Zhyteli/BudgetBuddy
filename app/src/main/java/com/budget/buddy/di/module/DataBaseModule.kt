@@ -1,6 +1,5 @@
 package com.budget.buddy.di.module
 
-import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.budget.buddy.data.database.AppDatabase
