@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.budget.buddy.data.database.AppDatabase
 import com.budget.buddy.data.database.CashTransactionDao
+import com.budget.buddy.data.database.MainUserDataMouthDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,4 +30,8 @@ object DataBaseModule {
     @Provides
     fun provideCashTransactionDao(database: AppDatabase): CashTransactionDao =
         database.cashTransactionDao()
+
+    @Provides
+    fun provideMainUserDataMouthDao(database: AppDatabase): MainUserDataMouthDao =
+        database.mainUserDataMouthDao()
 }

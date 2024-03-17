@@ -1,24 +1,36 @@
 package com.budget.buddy.presentation.view
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.budget.buddy.data.api.mono.ApiService
-import com.budget.buddy.domain.cash.usecase.AddCashTransactionUseCase
-import com.budget.buddy.domain.cash.usecase.DeleteTransactionUseCase
-import com.budget.buddy.domain.cash.usecase.DeleteTransactionsByIdsUseCase
-import com.budget.buddy.domain.cash.usecase.GetAllTransactionsUseCase
-import com.budget.buddy.domain.cash.usecase.GetTransactionByIdUseCase
-import com.budget.buddy.domain.cash.usecase.UpdateTransactionUseCase
-import com.budget.buddy.domain.cash.usecase.UpdateTransactionsUseCase
+import com.budget.buddy.data.api.mono.error.ErrorMono
+import com.budget.buddy.data.database.getdata.UserDataState
+import com.budget.buddy.domain.cash.usecase.cashtransaction.AddCashTransactionUseCase
+import com.budget.buddy.domain.cash.usecase.cashtransaction.DeleteTransactionUseCase
+import com.budget.buddy.domain.cash.usecase.cashtransaction.DeleteTransactionsByIdsUseCase
+import com.budget.buddy.domain.cash.usecase.cashtransaction.GetAllTransactionsUseCase
+import com.budget.buddy.domain.cash.usecase.cashtransaction.GetTransactionByIdUseCase
+import com.budget.buddy.domain.cash.usecase.cashtransaction.UpdateTransactionUseCase
+import com.budget.buddy.domain.cash.usecase.cashtransaction.UpdateTransactionsUseCase
+import com.budget.buddy.domain.cash.usecase.maindatauser.LoadDataMainUserDataMouthUseCase
 import com.budget.buddy.domain.mono.UsersBankDetails
+import com.budget.buddy.domain.user.MainUserDataMouth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.util.Calendar
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -31,10 +43,31 @@ class MainViewModel @Inject constructor(
     private val updateTransactionUseCase: UpdateTransactionUseCase,
 
     private val apiService: ApiService,
+
+    private val loadDataMainUserDataMouthUseCase: LoadDataMainUserDataMouthUseCase,
 ) : ViewModel() {
 
+    private val _userData = MutableStateFlow<UserDataState>(UserDataState.Loading)
+    val userData: StateFlow<UserDataState> = _userData.asStateFlow()
+
+    init {
+        initialUserData()
+    }
+
+    private fun initialUserData() {
+        viewModelScope.launch {
+            try {
+                val data = loadDataMainUserDataMouthUseCase()
+                _userData.value = UserDataState.Success(data)
+            } catch (e: Exception) {
+                _userData.value = UserDataState.Error(e.message ?: "Unknown Error")
+            }
+        }
+    }
+
+
     private val _resultUserDataApi = MutableLiveData<List<UsersBankDetails>>()
-    val resultUserDataApi:LiveData<List<UsersBankDetails>>
+    val resultUserDataApi: LiveData<List<UsersBankDetails>>
         get() = _resultUserDataApi
 
     fun testTime(): String {
@@ -62,7 +95,15 @@ class MainViewModel @Inject constructor(
                         _resultUserDataApi.postValue(it.toList())
                     }
                 } else {
-                    callbackError(response.errorBody()?.string().toString())
+                    val error = response.errorBody()?.string().toString()
+                    val json = JSONObject(error)
+                    if (json.has("errorDescription")) {
+                        if (json.get("errorDescription") != ErrorMono.ErrorDescription.error) {
+                            callbackError(json.getString("error"))
+                        }
+                    } else {
+                        callbackError(error)
+                    }
                 }
             } catch (e: Exception) {
                 callbackError(e.message.toString())

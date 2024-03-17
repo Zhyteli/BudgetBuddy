@@ -41,7 +41,6 @@ fun ItemCard(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
         ) {
             Image(
                 painter = painterResource(id = item.imageResourceId),
@@ -57,7 +56,8 @@ fun ItemCard(
             Text(
                 text = "%.2f".format(item.sum),
                 fontSize = 14.sp,
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End,
+                modifier = Modifier.padding(end = 50.dp)
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.budget.buddy.domain.cash.usecase
+package com.budget.buddy.domain.cash.usecase.cashtransaction
 
 import com.budget.buddy.domain.cash.repository.CashTransactionsRepository
 

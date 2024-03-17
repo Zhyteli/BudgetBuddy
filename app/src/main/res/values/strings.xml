@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">BudgetBuddy</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="description_of_the_beginning">Enter the name of the budget, the amount you are considering spending each month, and also, if desired, you can choose the currency and color of the card.</string>
+    <string name="save_data">Save data</string>
+    <string name="name">Name</string>
+    <string name="currency">Currency</string>
+    <string name="amount_of_money">Your Balance</string>
+    <string name="ukrainian_hryvnia">Ukrainian hryvnia</string>
+    <string name="us_dollar">US Dollar</string>
+    <string name="euro">Euro</string>
+    <string name="british_pound">British Pound</string>
+    <string name="monthly_balance">Monthly balance</string>
+    <string name="new_budget">New budget</string>
 </resources>
