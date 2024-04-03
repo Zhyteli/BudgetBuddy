@@ -12,4 +12,5 @@
     <string name="british_pound">British Pound</string>
     <string name="monthly_balance">Monthly balance</string>
     <string name="new_budget">New budget</string>
+    <string name="add_new_transaction">Add new transaction</string>
 </resources>

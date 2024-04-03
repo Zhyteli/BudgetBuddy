@@ -1,7 +1,9 @@
 package com.budget.buddy.di.module
 
 import com.budget.buddy.data.database.CashTransactionDao
+import com.budget.buddy.data.database.TimeDao
 import com.budget.buddy.data.impl.CashTransactionRepositoryImpl
+import com.budget.buddy.data.impl.WorkTime
 import com.budget.buddy.domain.cash.repository.CashTransactionsRepository
 import com.budget.buddy.domain.cash.usecase.cashtransaction.AddCashTransactionUseCase
 import com.budget.buddy.domain.cash.usecase.cashtransaction.DeleteTransactionUseCase
@@ -66,5 +68,11 @@ object CashTransactionModule {
     @Singleton
     fun provideUpdateTransactionUseCase(repository: CashTransactionsRepository): UpdateTransactionUseCase {
         return UpdateTransactionUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTime(dao: TimeDao): WorkTime {
+        return WorkTime(dao)
     }
 }

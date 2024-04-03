@@ -6,13 +6,13 @@ data class UsersBankDetails(
     @SerializedName("id")
     val id: String = "",
     @SerializedName("time")
-    val time: Long = 0,
+    val time: Int = 0,
     @SerializedName("description")
     val description: String = "",
     @SerializedName("mcc")
     val mcc: Int = 0,
     @SerializedName("amount")
-    val amount: Int = 0,
+    val amount: Double = 0.0,
     @SerializedName("operationAmount")
     val operationAmount: Int = 0,
     @SerializedName("currencyCode")

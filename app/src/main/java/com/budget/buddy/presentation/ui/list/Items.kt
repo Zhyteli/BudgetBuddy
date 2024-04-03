@@ -29,7 +29,8 @@ fun ItemCard(
     item: SpendingItem = SpendingItem(
         imageResourceId = R.drawable.ic_launcher_foreground,
         reason = "Shopping",
-        sum = 100.0
+        sum = 100.0,
+        time = 0
     ),
 ) {
     Card(
