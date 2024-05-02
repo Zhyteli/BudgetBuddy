@@ -1,6 +1,15 @@
 package com.budget.buddy.presentation.ui.card
 
+
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,16 +41,32 @@ fun CardCashTransaction(
     spent: Double = 0.0,
     balance: Double = 0.0
 ) {
+    // Creating an infinite transition for the shimmer effect
+    val infiniteTransition = rememberInfiniteTransition()
+    val translateAnim by infiniteTransition.animateFloat(
+        initialValue = 300f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 4000,
+                easing = LinearEasing // Ensures a smooth linear animation
+            ),
+            repeatMode = RepeatMode.Reverse // Reverses the animation on each iteration
+        ), label = ""
+    )
+
+    // Adjusting the gradient dynamically based on the animation value
     val pearlGradient = Brush.linearGradient(
         colors = listOf(
-            Color(0xFFF8E8C9), // Светлый тон перламутра
-            Color(0xFFA7CAD9), // Синий
-            Color(0xFFD8BFD8), // Светлый фиолетовый
-            Color(0xFFF8E8C9)  // Светлый тон перламутра
+            Color(0xFFF8E8C9),
+            Color(0xFFA7CAD9),
+            Color(0xFFD8BFD8),
+            Color(0xFFF8E8C9)
         ),
         start = Offset(0f, 0f),
-        end = Offset(200f, 200f) // Направление градиента
+        end = Offset(translateAnim, translateAnim) // Shimmer effect
     )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,45 +77,47 @@ fun CardCashTransaction(
             defaultElevation = 10.dp
         )
     ) {
-        val month = remember {
-            mutableStateOf("February")
-        }
-        month.value = MonthCalculationImpl.getMonth()
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+        Box(modifier = Modifier
+            .background(pearlGradient)
         ) {
-            Text(text = month.value, fontSize = 30.sp)
-
-            Spacer(modifier = Modifier.height(25.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            val month = remember { mutableStateOf("February") }
+            month.value = MonthCalculationImpl.getMonth()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Text(text = "Monthly budget", fontSize = 20.sp)
-                Text(text = "$monthlyBudget", fontSize = 20.sp)
-            }
+                Text(text = month.value, fontSize = 30.sp)
 
-            Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(25.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Spent", fontSize = 20.sp)
-                Text(text = "$spent", fontSize = 20.sp)
-            }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Monthly budget", fontSize = 20.sp)
+                    Text(text = "$monthlyBudget", fontSize = 20.sp)
+                }
 
-            Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Balance", fontSize = 32.sp)
-                Text(text = "$balance", fontSize = 32.sp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Spent", fontSize = 20.sp)
+                    Text(text = "$spent", fontSize = 20.sp)
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Balance", fontSize = 32.sp)
+                    Text(text = "$balance", fontSize = 32.sp)
+                }
             }
         }
     }

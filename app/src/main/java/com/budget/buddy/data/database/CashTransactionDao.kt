@@ -22,7 +22,7 @@ interface CashTransactionDao {
     suspend fun deleteTransactionsByIds(ids: List<Int>)
 
     @Query("SELECT * FROM CashTransaction")
-    suspend fun getAllTransactions(): List<CashTransaction>?
+    suspend fun getAllTransactions(): List<CashTransaction>
 
     @Query("SELECT * FROM CashTransaction WHERE id = :id")
     suspend fun getTransactionById(id: Int): CashTransaction?

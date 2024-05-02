@@ -12,10 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -37,16 +35,13 @@ import androidx.lifecycle.lifecycleScope
 import com.budget.buddy.R
 import com.budget.buddy.data.database.getdata.UserDataState
 import com.budget.buddy.domain.items.SpendingItem
-import com.budget.buddy.domain.mono.UsersBankDetails
+import com.budget.buddy.presentation.ui.additem.BottomSheetComponent
 import com.budget.buddy.presentation.ui.card.CardCashTransaction
 import com.budget.buddy.presentation.ui.list.ItemsList
 import com.budget.buddy.presentation.view.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -63,19 +58,33 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun MainActivity.MonthlyCheck() {
         val resultInitialUserData by viewModel.userData.collectAsState()
+        var dataUpdate by remember { mutableStateOf(true) }
 
         when (resultInitialUserData) {
             is UserDataState.Loading -> {}
             is UserDataState.Success -> {
                 val mainUserDataMouth = (resultInitialUserData as UserDataState.Success).data
+
                 if (mainUserDataMouth != null) {
-                    viewModel.checkingAvailabilityDataFromBank()
-                    val resultMono = viewModel.resultUserDataApi.observeAsState()
-//                    if (resultMono.value != null && resultMono.value!!.isEmpty()) {
-//                        getBankData()
-//                    }
-                    Log.d("TEST_", "Cash: ${resultMono.value}")
-                    MainSkrin(resultMono.value, mainUserDataMouth.balance)
+                    if (dataUpdate) {
+                        viewModel.checkingAvailabilityDataFromBank()
+                        dataUpdate = false
+                    }
+
+                    val resultMono by viewModel.resultUserDataApiLive.observeAsState()
+
+                    // Log the resultMono value directly
+                    Log.d("TEST_Check", "Result Mono: $resultMono")
+
+                    resultMono?.let {
+                        if (it.isEmpty()){
+                            Log.d("TEST_", "Cash: ${it}")
+                            getBankData()
+                        }
+                        MainSkrin(it, mainUserDataMouth.balance)
+                    } ?: run {
+                        Log.d("TEST_T_DAR", "Caskh: null")
+                    }
                 } else {
                     startActivity(Intent(this, StartActivity::class.java))
                     finish()
@@ -88,6 +97,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 
     @Composable
     private fun getBankData() {
@@ -102,11 +112,12 @@ class MainActivity : ComponentActivity() {
     @Preview
     @Composable
     private fun MainSkrin(
-        value: MutableList<UsersBankDetails>? = null,
+        value: MutableList<SpendingItem>? = null,
         monthlyBudget: Double = 0.0,
         spent: Double = 0.0,
         balance: Double = 0.0,
     ) {
+        var showBottomSheet = remember { mutableStateOf(false) }
         val spendingItems by viewModel.spendingItems.collectAsState()
         Box(
             modifier = Modifier
@@ -118,15 +129,13 @@ class MainActivity : ComponentActivity() {
                 CardCashTransaction(
                     monthlyBudget = monthlyBudget, spent = spent, balance = balance
                 )
-                // Преобразование списка UsersBankDetails в список SpendingItem
-                viewModel.updateSpendingItems(value)
+                // Update ViewModel's spending items
+                value?.let { viewModel.updateSpendingItems(it) }
 
-//                if (spendingItems.size == 0){
-//                    Text(text = "No items")
-//                }else{
-                Log.d("TEST_", spendingItems.toString())
-                ItemsList(items = spendingItems)
-//                }
+                if (spendingItems.isNotEmpty()) {
+                    Log.d("TEST_ItemsList", spendingItems.toString())
+                    ItemsList(items = spendingItems)
+                }
             }
         }
         Box(
@@ -149,16 +158,23 @@ class MainActivity : ComponentActivity() {
                         .wrapContentWidth()
                         .padding(10.dp)
                         .clickable {
-                            value?.add(UsersBankDetails(
-                                description = "TEST",
-                                amount = 1000.0,
-                                time = 412565652
-                            ))
-                            viewModel.updateSpendingItems(value)
+                            showBottomSheet.value = !showBottomSheet.value
                         },
                     contentDescription = stringResource(R.string.add_new_transaction),
                 )
             }
         }
+
+        BottomSheetComponent(
+            isVisible = showBottomSheet.value,
+            onDismiss = { showBottomSheet.value = false },
+            addNewItem = {
+                // Use the ViewModel function only to add the new item
+                viewModel.addSpendingItems(it)
+                showBottomSheet.value = false
+            }
+        )
+
     }
+
 }

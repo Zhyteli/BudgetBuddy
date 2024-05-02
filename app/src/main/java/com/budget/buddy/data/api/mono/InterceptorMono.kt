@@ -6,7 +6,7 @@ import okhttp3.Response
 class InterceptorMono : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
-            .addHeader("X-Token", "uNh6UFqepskDDOevuYAU_VEH45nmGtQExTHuccB0A0wE")
+            .addHeader("X-Token", "u8PfX2hoxKcqh-JUWvoQ-PgEp_W1WTdbwJm7eIdecGdY")
             .build()
         return chain.proceed(request)
     }

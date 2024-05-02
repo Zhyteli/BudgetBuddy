@@ -31,7 +31,6 @@ class StartActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StartScreen {
-                Log.d("TEST_", "Save data user: $it")
                 lifecycleScope.launch {
                     saveDataMainUserDataMouthUseCase(it)
                 }
