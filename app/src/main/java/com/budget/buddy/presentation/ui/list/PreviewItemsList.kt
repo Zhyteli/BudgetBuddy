@@ -14,6 +14,6 @@ fun PreviewItemsList(
     if (sItem.isEmpty()){
         Text(text = "No items")
     }else{
-        ItemsList(items = sItem)
+        ItemsList(items = sItem, onDelete = {}, onEdit = {})
     }
 }

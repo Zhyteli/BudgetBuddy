@@ -1,21 +1,49 @@
 package com.budget.buddy.presentation.ui.list
 
+import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Card
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.budget.buddy.R
 import com.budget.buddy.domain.items.SpendingItem
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun ItemsList(items: List<SpendingItem> = listOf()) {
-    GroupedItemsList(items)
+fun ItemsList(
+    items: List<SpendingItem> = listOf(),
+    onDelete: (SpendingItem) -> Unit,
+    onEdit: (SpendingItem) -> Unit,
+) {
+    GroupedItemsList(items,
+        onDelete = {
+            Log.d("ItemsList", "onDelete: $it")
+            onDelete(it)
+        },
+        onEdit = {
+            Log.d("ItemsList", "onEdit: $it")
+            onEdit(it)
+        }
+    )
 }
 
 @Composable
@@ -27,17 +55,23 @@ fun HeaderItem(header: String) {
             .padding(8.dp)
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GroupedItemsList(items: List<SpendingItem>) {
+fun GroupedItemsList(
+    items: List<SpendingItem>,
+    onDelete: (SpendingItem) -> Unit,
+    onEdit: (SpendingItem) -> Unit,
+) {
     val today = LocalDate.now()
     val yesterday = today.minusDays(1)
 
     // Grouping transactions by date
     val groupedItems = items.groupBy {
-        val date = LocalDate.ofEpochDay((it.time / (24 * 60 * 60)).toLong()) // Assuming `time` is in seconds
-        when {
-            date == today -> "Today"
-            date == yesterday -> "Yesterday"
+        val date = LocalDate.ofEpochDay((it.time / (24 * 60 * 60)).toLong())
+        when (date) {
+            today -> stringResource(R.string.today)
+            yesterday -> stringResource(R.string.yesterday)
             else -> date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
         }
     }
@@ -51,9 +85,29 @@ fun GroupedItemsList(items: List<SpendingItem>) {
                 HeaderItem(header)
             }
 
-            items(transactions) { item ->
-                // Display each SpendingItem in the group
-                ItemCard(item)
+            itemsIndexed(items = transactions, key = { index, item ->
+                // Ensure the key is unique. Use item.id and index as a fallback if id is not unique
+                "${item.id}_${index}"
+            }) { _, item ->
+                val dismissState = rememberDismissState()
+
+                if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+                    onDelete(item)
+                }
+                if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+                    onEdit(item)
+                }
+
+                SwipeToDismiss(
+                    state = dismissState,
+                    directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
+                    background = {
+                        DelItems(dismissState.dismissDirection ?: DismissDirection.StartToEnd)
+                    },
+                    dismissContent = {
+                        ItemCard(item)
+                    }
+                )
             }
         }
     }

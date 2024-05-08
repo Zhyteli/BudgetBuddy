@@ -21,15 +21,19 @@ import com.budget.buddy.domain.cash.usecase.maindatauser.LoadDataMainUserDataMou
 import com.budget.buddy.domain.items.SpendingItem
 import com.budget.buddy.domain.mapper.MapperCategoriesItemForNumber
 import com.budget.buddy.domain.mono.UsersBankDetails
+import com.budget.buddy.domain.user.MainUserDataMouth
 import com.budget.buddy.domain.user.Time
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.text.NumberFormat
 import java.util.Calendar
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,6 +62,14 @@ class MainViewModel @Inject constructor(
     val resultUserDataApiLive: LiveData<MutableList<SpendingItem>>
         get() = _resultUserDataApiLive
 
+    private val _liveBalance = MutableLiveData<Double>()
+    val liveBalance: LiveData<Double>
+        get() = _liveBalance
+
+    private val _spentAll = MutableLiveData<Double>()
+    val spentAll: LiveData<Double>
+        get() = _spentAll
+
     init {
         initialUserData()
     }
@@ -77,10 +89,13 @@ class MainViewModel @Inject constructor(
             val d = MapperCategoriesItemForNumber.mapOfNumber(item.imageResourceId)
             saveAddCashTransactionUseCase(
                 CashTransaction(
+                    id = item.id,
                     amount = item.sum,
                     date = item.time,
                     description = item.reason,
-                    type = d
+                    type = d,
+                    descriptionFull = item.description,
+                    transaction = item.transaction
                 )
             )
 
@@ -91,6 +106,7 @@ class MainViewModel @Inject constructor(
 
             // If _resultUserDataApiLive is needed to be updated
             _resultUserDataApiLive.value = currentList
+            spendingCounter(loadDataMainUserDataMouthUseCase() ?: MainUserDataMouth())
         }
     }
 
@@ -100,13 +116,15 @@ class MainViewModel @Inject constructor(
             getAllTransactionsUseCase()?.let { list ->
                 val updatedList = list.map {
                     SpendingItem(
+                        id = it.id,
                         imageResourceId = MapperCategoriesItemForNumber.mapOfCategoriesItem(it.type).icons,
                         reason = it.description ?: "null",
                         sum = it.amount,
-                        time = it.date
+                        time = it.date,
+                        description = it.descriptionFull ?: "null",
+                        transaction = it.amount > 0
                     )
-                }.sortedByDescending { it.time }
-                    .toMutableList()
+                }.sortedByDescending { it.time }.toMutableList()
 
                 // Log the size of the updated list
                 Log.d("TEST_ViewModel", "Updated List Size: ${updatedList.size}")
@@ -114,7 +132,6 @@ class MainViewModel @Inject constructor(
                 _spendingItems.value = updatedList
                 _resultUserDataApiLive.value = updatedList
             } ?: run {
-                Log.d("TEST_ViewModel", "Data fetching returned null")
                 _resultUserDataApiLive.postValue(mutableListOf())
             }
         }
@@ -135,7 +152,7 @@ class MainViewModel @Inject constructor(
 
     fun testTime(): String {
         val calendarFrom = Calendar.getInstance()
-        calendarFrom.set(Calendar.MONTH, Calendar.APRIL)
+        calendarFrom.set(Calendar.MONTH, Calendar.MAY)
         calendarFrom.set(Calendar.DAY_OF_MONTH, 1)
         calendarFrom.set(Calendar.HOUR_OF_DAY, 0)
         calendarFrom.set(Calendar.MINUTE, 0)
@@ -146,8 +163,8 @@ class MainViewModel @Inject constructor(
 
     fun testTime2(): String {
         val calendarFrom = Calendar.getInstance()
-        calendarFrom.set(Calendar.MONTH, Calendar.APRIL)
-        calendarFrom.set(Calendar.DAY_OF_MONTH, 30)
+        calendarFrom.set(Calendar.MONTH, Calendar.MAY)
+        calendarFrom.set(Calendar.DAY_OF_MONTH, 5)
         calendarFrom.set(Calendar.HOUR_OF_DAY, 0)
         calendarFrom.set(Calendar.MINUTE, 0)
         calendarFrom.set(Calendar.SECOND, 0)
@@ -175,34 +192,28 @@ class MainViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     val userData: Array<UsersBankDetails>? = response.body()
                     userData?.let { array ->
-                        // Map the array data to the CashTransaction and save them
-                        array.map {
-                            val transaction = CashTransaction(
-                                amount = it.amount / 100.0,
-                                date = it.time,
-                                description = it.description,
-                                type = it.mcc / 100
-                            )
-                            saveAddCashTransactionUseCase(transaction)
-                        }
+                        val uniqueTransactions = array.distinctBy { it.id }
 
-                        val transactions = getAllTransactionsUseCase()
+                        uniqueTransactions.forEach { bankTransaction ->
+                            // Check if the transaction already exists in the database
+                            val existingTransaction = getTransactionByIdUseCase(bankTransaction.id)
 
-                        transactions?.let { list ->
-                            // Create a SpendingItem list from transactions
-                            val spendingItems = list.map { transaction ->
-                                SpendingItem(
-                                    imageResourceId = MapperCategoriesItemForNumber.mapOfCategoriesItem(transaction.type).icons,
-                                    reason = transaction.description ?: "null",
-                                    sum = transaction.amount,
-                                    time = transaction.date
+                            if (existingTransaction == null) {
+                                // Transaction doesn't exist, save it
+                                val transaction = CashTransaction(
+                                    amount = bankTransaction.amount / 100.0,
+                                    date = bankTransaction.time,
+                                    description = bankTransaction.description,
+                                    descriptionFull = bankTransaction.description,
+                                    type = bankTransaction.mcc / 100,
+                                    transaction = (bankTransaction.amount / 100.0) > 0
                                 )
-                            }.sortedByDescending { it.time }
-                                .toMutableList()
-
-                            // Post the spending items list
-                            _resultUserDataApiLive.postValue(spendingItems)
+                                Log.d("TEST_FUL_TR", "Transaction: $bankTransaction")
+                                saveAddCashTransactionUseCase(transaction)
+//                                spendingCounter(loadDataMainUserDataMouthUseCase() ?: MainUserDataMouth())
+                            }
                         }
+                        checkingAvailabilityDataFromBank()
                     }
                 } else {
                     val error = response.errorBody()?.string().toString()
@@ -223,16 +234,86 @@ class MainViewModel @Inject constructor(
 
 
     private suspend fun MainViewModel.saveAddCashTransactionUseCase(transaction: CashTransaction) {
-        getAllTransactionsUseCase()?.let {all->
-            if (all.all { it.date != transaction.date }) {
+        getAllTransactionsUseCase()?.let { all ->
+            if (all.all { it.date != transaction.date && it.id != transaction.id }) {
                 addCashTransactionUseCase(
                     transaction
                 )
+            } else {
+                deleteTransactionUseCase(transaction)
             }
-        } ?: run {
-            addCashTransactionUseCase(
-                transaction
+        }
+    }
+
+    fun spendingCounter(mainUserDataMouth: MainUserDataMouth) {
+        viewModelScope.launch {
+            delay(1500)
+            val transactions = getAllTransactionsUseCase() ?: emptyList()
+            // Calculate spent amount only on transactions with negative amounts and not marked as 'transaction'
+            val totalSpent: Double =
+                transactions.filter { !it.transaction }.sumOf { it.amount }
+            Log.d("Total_Spent", totalSpent.toString())
+            val totalIncome: Double =
+                transactions.filter { it.transaction }.sumOf { it.amount }
+            Log.d("Total_Income", totalIncome.toString())
+            val total = totalIncome + totalSpent
+
+            // Create a NumberFormat for your locale (e.g., Germany)
+            val numberFormat = NumberFormat.getInstance(Locale.GERMANY)
+            numberFormat.maximumFractionDigits = 2
+
+            // Format values with commas as decimal separators
+            val formattedTotalSpent = numberFormat.format(total)
+
+            // Log formatted amounts for debugging
+            Log.d("Formatted Total Spent", formattedTotalSpent)
+
+            // Parse formatted values back to Double
+            val parsedTotalSpent = numberFormat.parse(formattedTotalSpent)?.toDouble() ?: 0.0
+
+            // Update live data values
+            _spentAll.value = parsedTotalSpent
+            Log.d("Total_Spent_End", total.toString())
+            _liveBalance.value = mainUserDataMouth.balance + total
+        }
+    }
+
+    fun deleteSpendingItem(it: SpendingItem) {
+        viewModelScope.launch {
+            deleteTransactionUseCase(
+                CashTransaction(
+                    id = it.id,
+                    amount = it.sum,
+                    date = it.time,
+                    description = it.reason,
+                    type = MapperCategoriesItemForNumber.mapOfNumber(it.imageResourceId),
+                    descriptionFull = it.description,
+                    transaction = it.transaction
+                )
             )
+
+            // Remove the item from the list and update the state
+            val currentList = _spendingItems.value.toMutableList()
+            currentList.remove(it)
+            _spendingItems.value = currentList
+
+            // If _resultUserDataApiLive is needed to be updated
+            _resultUserDataApiLive.value = currentList
+            spendingCounter(loadDataMainUserDataMouthUseCase() ?: MainUserDataMouth())
+        }
+    }
+
+    fun editSpendingItem(it: SpendingItem) {
+        viewModelScope.launch {
+            // Update the item in the list and update the state
+            val currentList = _spendingItems.value.toMutableList()
+            val index = currentList.indexOf(it)
+            currentList[index] = it
+            _spendingItems.value = currentList
+
+            // If _resultUserDataApiLive is needed to be updated
+            _resultUserDataApiLive.value = currentList
+            spendingCounter(loadDataMainUserDataMouthUseCase() ?: MainUserDataMouth())
         }
     }
 }

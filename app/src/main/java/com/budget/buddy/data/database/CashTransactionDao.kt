@@ -6,7 +6,7 @@ import com.budget.buddy.domain.cash.CashTransaction
 @Dao
 interface CashTransactionDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(transaction: CashTransaction)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -25,6 +25,6 @@ interface CashTransactionDao {
     suspend fun getAllTransactions(): List<CashTransaction>
 
     @Query("SELECT * FROM CashTransaction WHERE id = :id")
-    suspend fun getTransactionById(id: Int): CashTransaction?
+    suspend fun getTransactionById(id: String): CashTransaction?
 
 }

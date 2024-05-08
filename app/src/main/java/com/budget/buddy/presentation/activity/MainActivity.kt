@@ -36,6 +36,7 @@ import com.budget.buddy.R
 import com.budget.buddy.data.database.getdata.UserDataState
 import com.budget.buddy.domain.items.SpendingItem
 import com.budget.buddy.presentation.ui.additem.BottomSheetComponent
+import com.budget.buddy.presentation.ui.additem.EditItem
 import com.budget.buddy.presentation.ui.card.CardCashTransaction
 import com.budget.buddy.presentation.ui.list.ItemsList
 import com.budget.buddy.presentation.view.MainViewModel
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MonthlyCheck()
+            EditItem()
         }
     }
 
@@ -70,21 +71,19 @@ class MainActivity : ComponentActivity() {
                         viewModel.checkingAvailabilityDataFromBank()
                         dataUpdate = false
                     }
-
-                    val resultMono by viewModel.resultUserDataApiLive.observeAsState()
+                    val resultMono = viewModel.resultUserDataApiLive.observeAsState()
 
                     // Log the resultMono value directly
-                    Log.d("TEST_Check", "Result Mono: $resultMono")
+                    Log.d("TEST_Check", "Result Mono: ${resultMono.value}")
 
-                    resultMono?.let {
-                        if (it.isEmpty()){
+                    resultMono.value?.let {
+                        if (it.isEmpty()) {
                             Log.d("TEST_", "Cash: ${it}")
                             getBankData()
                         }
                         MainSkrin(it, mainUserDataMouth.balance)
-                    } ?: run {
-                        Log.d("TEST_T_DAR", "Caskh: null")
                     }
+                    viewModel.spendingCounter(mainUserDataMouth)
                 } else {
                     startActivity(Intent(this, StartActivity::class.java))
                     finish()
@@ -119,6 +118,8 @@ class MainActivity : ComponentActivity() {
     ) {
         var showBottomSheet = remember { mutableStateOf(false) }
         val spendingItems by viewModel.spendingItems.collectAsState()
+        val spentAll by viewModel.spentAll.observeAsState()
+        val balanceAll by viewModel.liveBalance.observeAsState()
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -127,14 +128,18 @@ class MainActivity : ComponentActivity() {
         ) {
             Column {
                 CardCashTransaction(
-                    monthlyBudget = monthlyBudget, spent = spent, balance = balance
+                    monthlyBudget = monthlyBudget, spent = spentAll ?: spent, balance = balanceAll ?: balance
                 )
                 // Update ViewModel's spending items
                 value?.let { viewModel.updateSpendingItems(it) }
 
                 if (spendingItems.isNotEmpty()) {
                     Log.d("TEST_ItemsList", spendingItems.toString())
-                    ItemsList(items = spendingItems)
+                    ItemsList(items = spendingItems, onDelete = {
+                        viewModel.deleteSpendingItem(it)
+                    }, onEdit = {
+                        viewModel.editSpendingItem(it)
+                    })
                 }
             }
         }
@@ -170,6 +175,7 @@ class MainActivity : ComponentActivity() {
             onDismiss = { showBottomSheet.value = false },
             addNewItem = {
                 // Use the ViewModel function only to add the new item
+                Log.d("Total_", "MainSkrin: $it")
                 viewModel.addSpendingItems(it)
                 showBottomSheet.value = false
             }

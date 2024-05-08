@@ -12,7 +12,7 @@ import com.budget.buddy.domain.user.Time
         MainUserDataMouth::class,
         Time::class
     ],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

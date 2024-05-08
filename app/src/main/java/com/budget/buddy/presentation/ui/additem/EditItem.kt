@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.budget.buddy.presentation.ui.additem
 
 import androidx.compose.animation.AnimatedVisibility
@@ -42,6 +40,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -54,9 +54,10 @@ import com.budget.buddy.presentation.ui.categories.CategoriesItemData
 import com.budget.buddy.presentation.ui.categories.CategoryIcons
 import com.budget.buddy.presentation.ui.categories.listScrol
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun BottomSheetComponent(
+fun EditItem(
     isVisible: Boolean = true,
     onDismiss: () -> Unit = {},
     addNewItem: (SpendingItem) -> Unit = {},
@@ -65,6 +66,7 @@ fun BottomSheetComponent(
     val overlayStartDelay =
         animationDuration / 2 // Start the overlay animation halfway through the bottom sheet animation
     var transaction by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
     var categoryIcons by remember {
         mutableStateOf(
             CategoriesItemData(
@@ -116,76 +118,40 @@ fun BottomSheetComponent(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp),
+                    .height(300.dp),
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row(modifier = Modifier.padding(16.dp)) {
-                        var selected by remember { mutableStateOf(false) }
-                        FilterChip(
-                            modifier = Modifier.size(width = 80.dp, height = 50.dp),
-                            onClick = { selected = !selected },
-                            label = {
-                                Text("Costs")
-                            },
-                            selected = selected,
-                            leadingIcon = if (selected) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Filled.Add,
-                                        contentDescription = "Done icon",
-                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                    )
-                                    transaction = true
-                                }
-                            } else {
-                                transaction = false
-                                null
-                            },
-                        )
-                        Box(modifier = Modifier.padding(top = 3.dp, start = 10.dp)) {
+                    Card(
+                        modifier = Modifier
+                            .padding(top = 15.dp, start = 10.dp)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(280.dp, 100.dp)
+                                .background(Color.LightGray)
+                        ) {
                             BasicTextField(
                                 value = sumUser.value,
                                 onValueChange = { sumUser.value = it },
-                                decorationBox = { innerTextField ->
-                                    if (sumUser.value.isEmpty()) {
-                                        Text(
-                                            "0",
-                                            color = Color.DarkGray,
-                                            fontSize = 30.sp
-                                        )
-                                    }
-                                    innerTextField()
-                                },
                                 singleLine = true,
-                                textStyle = TextStyle(color = Color.Black, fontSize = 30.sp),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                textStyle = TextStyle(color = Color.Black, fontSize = 20.sp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(focusRequester)
                             )
-                        }
-                    }
-                    LazyRow(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                    ) {
-                        items(listScrol) { item ->
-                            Spacer(modifier = Modifier.size(8.dp))
-                            CategoriesItem(item) {
-                                categoryIcons = it
+                            if (sumUser.value.isEmpty()) {
+                                Text("Element comments", color = Color.DarkGray, fontSize = 20.sp)
                             }
                         }
                     }
+
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            addNewItem(
-                                SpendingItem(
-                                    imageResourceId = categoryIcons.icon,
-                                    reason = categoryIcons.title,
-                                    sum = if (transaction) sumUser.value.toDouble() else -1 * sumUser.value.toDouble(),
-                                    time = (System.currentTimeMillis() / 1000).toInt(),
-                                    transaction = transaction
-                                )
-                            )
+
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                     ) {

@@ -32,7 +32,7 @@ class CashTransactionRepositoryImpl @Inject constructor(
         return cashTransactionDao.getAllTransactions()
     }
 
-    override suspend fun getTransactionById(id: Int): CashTransaction? {
+    override suspend fun getTransactionById(id: String): CashTransaction? {
         return cashTransactionDao.getTransactionById(id)
     }
 }

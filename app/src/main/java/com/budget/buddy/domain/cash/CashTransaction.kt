@@ -5,9 +5,11 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class CashTransaction(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int = (0..10000).random(),
     val amount: Double,
     val date: Int,
     val description: String? = null,
+    val descriptionFull: String? = null,
     val type: Int,
+    val transaction: Boolean = false
 )

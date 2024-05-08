@@ -9,5 +9,5 @@ interface CashTransactionsRepository {
     suspend fun deleteTransaction(transaction: CashTransaction)
     suspend fun deleteTransactionsByIds(ids: List<Int>)
     suspend fun getAllTransactions(): List<CashTransaction>?
-    suspend fun getTransactionById(id: Int): CashTransaction?
+    suspend fun getTransactionById(id: String): CashTransaction?
 }
