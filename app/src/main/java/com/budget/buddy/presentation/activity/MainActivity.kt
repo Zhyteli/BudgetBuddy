@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            EditItem()
+            MonthlyCheck()
         }
     }
 
@@ -120,6 +120,8 @@ class MainActivity : ComponentActivity() {
         val spendingItems by viewModel.spendingItems.collectAsState()
         val spentAll by viewModel.spentAll.observeAsState()
         val balanceAll by viewModel.liveBalance.observeAsState()
+        var editShow = remember { mutableStateOf(false) }
+        val newSpendingItem = remember { mutableStateOf(SpendingItem()) }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -128,7 +130,9 @@ class MainActivity : ComponentActivity() {
         ) {
             Column {
                 CardCashTransaction(
-                    monthlyBudget = monthlyBudget, spent = spentAll ?: spent, balance = balanceAll ?: balance
+                    monthlyBudget = monthlyBudget,
+                    spent = spentAll ?: spent,
+                    balance = balanceAll ?: balance
                 )
                 // Update ViewModel's spending items
                 value?.let { viewModel.updateSpendingItems(it) }
@@ -138,7 +142,8 @@ class MainActivity : ComponentActivity() {
                     ItemsList(items = spendingItems, onDelete = {
                         viewModel.deleteSpendingItem(it)
                     }, onEdit = {
-                        viewModel.editSpendingItem(it)
+                        newSpendingItem.value = it
+                        editShow.value = !editShow.value
                     })
                 }
             }
@@ -175,11 +180,15 @@ class MainActivity : ComponentActivity() {
             onDismiss = { showBottomSheet.value = false },
             addNewItem = {
                 // Use the ViewModel function only to add the new item
-                Log.d("Total_", "MainSkrin: $it")
                 viewModel.addSpendingItems(it)
                 showBottomSheet.value = false
             }
         )
+        EditItem(editShow.value, item = newSpendingItem ,onDismiss = { editShow.value = false },
+            addNewItem = {
+                viewModel.editSpendingItem(it)
+                editShow.value = false
+            })
 
     }
 

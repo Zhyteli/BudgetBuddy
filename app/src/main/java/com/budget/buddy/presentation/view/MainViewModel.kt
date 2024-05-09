@@ -152,7 +152,7 @@ class MainViewModel @Inject constructor(
 
     fun testTime(): String {
         val calendarFrom = Calendar.getInstance()
-        calendarFrom.set(Calendar.MONTH, Calendar.MAY)
+        calendarFrom.set(Calendar.MONTH, Calendar.APRIL)
         calendarFrom.set(Calendar.DAY_OF_MONTH, 1)
         calendarFrom.set(Calendar.HOUR_OF_DAY, 0)
         calendarFrom.set(Calendar.MINUTE, 0)
@@ -163,8 +163,8 @@ class MainViewModel @Inject constructor(
 
     fun testTime2(): String {
         val calendarFrom = Calendar.getInstance()
-        calendarFrom.set(Calendar.MONTH, Calendar.MAY)
-        calendarFrom.set(Calendar.DAY_OF_MONTH, 5)
+        calendarFrom.set(Calendar.MONTH, Calendar.APRIL)
+        calendarFrom.set(Calendar.DAY_OF_MONTH, 30)
         calendarFrom.set(Calendar.HOUR_OF_DAY, 0)
         calendarFrom.set(Calendar.MINUTE, 0)
         calendarFrom.set(Calendar.SECOND, 0)
@@ -306,13 +306,20 @@ class MainViewModel @Inject constructor(
     fun editSpendingItem(it: SpendingItem) {
         viewModelScope.launch {
             // Update the item in the list and update the state
-            val currentList = _spendingItems.value.toMutableList()
-            val index = currentList.indexOf(it)
-            currentList[index] = it
-            _spendingItems.value = currentList
-
-            // If _resultUserDataApiLive is needed to be updated
-            _resultUserDataApiLive.value = currentList
+            getTransactionByIdUseCase(it.id.toString())?.let {
+                updateTransactionUseCase(
+                    CashTransaction(
+                        id = it.id,
+                        amount = it.amount,
+                        date = it.date,
+                        description = it.description,
+                        type = it.type,
+                        descriptionFull = it.descriptionFull,
+                        transaction = it.transaction
+                    )
+                )
+            }
+            checkingAvailabilityDataFromBank()
             spendingCounter(loadDataMainUserDataMouthUseCase() ?: MainUserDataMouth())
         }
     }

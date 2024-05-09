@@ -13,11 +13,13 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Card
 import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -90,12 +92,8 @@ fun GroupedItemsList(
                 "${item.id}_${index}"
             }) { _, item ->
                 val dismissState = rememberDismissState()
-
                 if (dismissState.isDismissed(DismissDirection.EndToStart)) {
                     onDelete(item)
-                }
-                if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
-                    onEdit(item)
                 }
 
                 SwipeToDismiss(
@@ -108,7 +106,16 @@ fun GroupedItemsList(
                         ItemCard(item)
                     }
                 )
+
+                // Handling the action and reset after a gesture is detected
+                LaunchedEffect(dismissState.currentValue) {
+                    if (dismissState.currentValue == DismissValue.DismissedToEnd) {
+                        onEdit(item)  // Assuming edit does not need to remove the item
+                        dismissState.reset()  // Reset after performing the action
+                    }
+                }
             }
         }
     }
 }
+
