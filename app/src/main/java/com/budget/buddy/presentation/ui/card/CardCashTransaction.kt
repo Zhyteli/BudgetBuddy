@@ -29,9 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.budget.buddy.R
 import com.budget.buddy.data.impl.MonthCalculationImpl
 
 @Preview
@@ -48,7 +51,7 @@ fun CardCashTransaction(
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = 4000,
+                durationMillis = 5000,
                 easing = LinearEasing // Ensures a smooth linear animation
             ),
             repeatMode = RepeatMode.Reverse // Reverses the animation on each iteration
@@ -58,10 +61,10 @@ fun CardCashTransaction(
     // Adjusting the gradient dynamically based on the animation value
     val pearlGradient = Brush.linearGradient(
         colors = listOf(
-            Color(0xFFF8E8C9),
-            Color(0xFFA7CAD9),
-            Color(0xFFD8BFD8),
-            Color(0xFFF8E8C9)
+            Color(0xFF565c68),  // Darker shade of beige
+            Color(0xFF5E7587),  // Darker shade of light blue
+            Color(0xFF7A6B7A),  // Darker shade of thistle
+            Color(0xFF565c68)
         ),
         start = Offset(0f, 0f),
         end = Offset(translateAnim, translateAnim) // Shimmer effect
@@ -77,8 +80,9 @@ fun CardCashTransaction(
             defaultElevation = 10.dp
         )
     ) {
-        Box(modifier = Modifier
-            .background(pearlGradient)
+        Box(
+            modifier = Modifier
+                .background(pearlGradient)
         ) {
             val month = remember { mutableStateOf("February") }
             month.value = MonthCalculationImpl.getMonth()
@@ -87,7 +91,14 @@ fun CardCashTransaction(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = month.value, fontSize = 30.sp)
+                Text(
+                    text = month.value,
+                    fontSize = 30.sp,
+                    color = Color.White,
+                    fontFamily = FontFamily(
+                        Font(R.font.open)
+                    )
+                )
 
                 Spacer(modifier = Modifier.height(25.dp))
 
@@ -95,8 +106,18 @@ fun CardCashTransaction(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Monthly budget", fontSize = 20.sp)
-                    Text(text = "$monthlyBudget", fontSize = 20.sp)
+                    Text(
+                        text = "Monthly budget", fontSize = 20.sp, color = Color.White,
+                        fontFamily = FontFamily(
+                            Font(R.font.open)
+                        )
+                    )
+                    Text(
+                        text = "$monthlyBudget", fontSize = 20.sp, color = Color.White,
+                        fontFamily = FontFamily(
+                            Font(R.font.open)
+                        )
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -105,8 +126,18 @@ fun CardCashTransaction(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Spent", fontSize = 20.sp)
-                    Text(text = "$spent", fontSize = 20.sp)
+                    Text(
+                        text = "Spent", fontSize = 20.sp, color = Color.White,
+                        fontFamily = FontFamily(
+                            Font(R.font.open)
+                        )
+                    )
+                    Text(
+                        text = "$spent", fontSize = 20.sp, color = Color.White,
+                        fontFamily = FontFamily(
+                            Font(R.font.open)
+                        )
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -115,8 +146,18 @@ fun CardCashTransaction(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Balance", fontSize = 32.sp)
-                    Text(text = "$balance", fontSize = 32.sp)
+                    Text(
+                        text = "Balance", fontSize = 32.sp, color = Color.White,
+                        fontFamily = FontFamily(
+                            Font(R.font.open)
+                        )
+                    )
+                    Text(
+                        text = "$balance", fontSize = 32.sp, color = Color.White,
+                        fontFamily = FontFamily(
+                            Font(R.font.open)
+                        )
+                    )
                 }
             }
         }

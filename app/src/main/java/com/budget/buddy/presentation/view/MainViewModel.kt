@@ -273,8 +273,7 @@ class MainViewModel @Inject constructor(
 
             // Update live data values
             _spentAll.value = parsedTotalSpent
-            Log.d("Total_Spent_End", total.toString())
-            _liveBalance.value = mainUserDataMouth.balance + total
+            _liveBalance.value = mainUserDataMouth.balance + parsedTotalSpent
         }
     }
 

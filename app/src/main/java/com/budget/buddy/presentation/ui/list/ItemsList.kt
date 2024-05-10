@@ -17,12 +17,16 @@ import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.budget.buddy.R
 import com.budget.buddy.domain.items.SpendingItem
@@ -50,12 +54,18 @@ fun ItemsList(
 
 @Composable
 fun HeaderItem(header: String) {
-    BasicText(
-        text = header,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    )
+    Card(Modifier.padding(horizontal = 15.dp, vertical = 10.dp)) {
+        Box(Modifier.background(Color(R.color.on_primary))) {
+            Text(
+                text = header,
+                color = Color.White,
+                fontFamily = FontFamily(Font(R.font.open)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

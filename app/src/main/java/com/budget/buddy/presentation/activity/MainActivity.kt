@@ -8,16 +8,27 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,14 +38,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import com.budget.buddy.R
 import com.budget.buddy.data.database.getdata.UserDataState
 import com.budget.buddy.domain.items.SpendingItem
+import com.budget.buddy.domain.user.MainUserDataMouth
 import com.budget.buddy.presentation.ui.additem.BottomSheetComponent
 import com.budget.buddy.presentation.ui.additem.EditItem
 import com.budget.buddy.presentation.ui.card.CardCashTransaction
@@ -52,7 +68,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MonthlyCheck()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color(R.color.background))
+            ) {
+                MonthlyCheck()
+            }
         }
     }
 
@@ -81,7 +103,7 @@ class MainActivity : ComponentActivity() {
                             Log.d("TEST_", "Cash: ${it}")
                             getBankData()
                         }
-                        MainSkrin(it, mainUserDataMouth.balance)
+                        MainSkrin(it, mainUserDataMouth)
                     }
                     viewModel.spendingCounter(mainUserDataMouth)
                 } else {
@@ -112,7 +134,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun MainSkrin(
         value: MutableList<SpendingItem>? = null,
-        monthlyBudget: Double = 0.0,
+        monthlyBudget: MainUserDataMouth = MainUserDataMouth(),
         spent: Double = 0.0,
         balance: Double = 0.0,
     ) {
@@ -125,12 +147,39 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 50.dp),
+                .background(color = Color(R.color.surface)),
             contentAlignment = Alignment.TopCenter
         ) {
             Column {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), // Ensure the Row uses the full width
+                        horizontalArrangement = Arrangement.SpaceBetween // Arrange children to start and end
+                    ) {
+                        Text(
+                            text = monthlyBudget.name,
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(10.dp),
+                            color = Color.White,
+                            fontFamily = FontFamily(
+                                Font(R.font.open)
+                            )
+                        )
+                        Icon(
+                            tint = Color.White,
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Menu",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .padding(10.dp)
+                        )
+                    }
+                }
                 CardCashTransaction(
-                    monthlyBudget = monthlyBudget,
+                    monthlyBudget = monthlyBudget.balance,
                     spent = spentAll ?: spent,
                     balance = balanceAll ?: balance
                 )
@@ -162,16 +211,20 @@ class MainActivity : ComponentActivity() {
                     defaultElevation = 10.dp
                 )
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.baseline_add_24),
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .padding(10.dp)
-                        .clickable {
-                            showBottomSheet.value = !showBottomSheet.value
-                        },
-                    contentDescription = stringResource(R.string.add_new_transaction),
-                )
+                Box(Modifier.background(Color.DarkGray)) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(10.dp)
+                            .clickable {
+                                showBottomSheet.value = !showBottomSheet.value
+                            },
+                        tint = Color.White
+                    )
+
+                }
             }
         }
 
@@ -184,7 +237,7 @@ class MainActivity : ComponentActivity() {
                 showBottomSheet.value = false
             }
         )
-        EditItem(editShow.value, item = newSpendingItem ,onDismiss = { editShow.value = false },
+        EditItem(editShow.value, item = newSpendingItem, onDismiss = { editShow.value = false },
             addNewItem = {
                 viewModel.editSpendingItem(it)
                 editShow.value = false

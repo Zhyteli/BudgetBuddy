@@ -41,6 +41,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.budget.buddy.R
 import com.budget.buddy.domain.items.SpendingItem
 
 @Preview
@@ -57,7 +58,6 @@ fun EditItem(
     val sumUser = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val context = LocalContext.current
-    Log.d("TEST_FSS", "newSpendingItem: $item")
     // State for controlling the overlay opacity
     val overlayAlpha by animateFloatAsState(
         targetValue = if (isVisible) 0.8f else 0f,
@@ -105,63 +105,69 @@ fun EditItem(
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp)
-                ) {
-                    Card(
+                Box(Modifier
+                    .background(Color(R.color.background))
+                    .height(500.dp)
+                ){
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp)
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
                     ) {
-                        Box(
+                        Card(
                             modifier = Modifier
-                                .height(100.dp)
-                                .background(Color.LightGray)
-                                .clickable { focusRequester.requestFocus() }
-                                .padding(horizontal = 16.dp),
-                            contentAlignment = Alignment.TopStart
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp)
                         ) {
-                            BasicTextField(
-                                value = sumUser.value,
-                                onValueChange = { sumUser.value = it },
-                                textStyle = TextStyle(color = Color.Black, fontSize = 20.sp),
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .focusRequester(focusRequester),
-                                decorationBox = { innerTextField ->
-                                    if (sumUser.value.isEmpty()) {
-                                        Text(
-                                            if (item.value.description == "") "Element comments" else item.value.description,
-                                            color = Color.DarkGray,
-                                            fontSize = 20.sp
-                                        )
+                                    .height(100.dp)
+                                    .background(Color.LightGray)
+                                    .clickable { focusRequester.requestFocus() }
+                                    .padding(horizontal = 16.dp),
+                                contentAlignment = Alignment.TopStart
+                            ) {
+                                BasicTextField(
+                                    value = sumUser.value,
+                                    onValueChange = { sumUser.value = it },
+                                    textStyle = TextStyle(color = Color.Black, fontSize = 20.sp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .focusRequester(focusRequester),
+                                    decorationBox = { innerTextField ->
+                                        if (sumUser.value.isEmpty()) {
+                                            Text(
+                                                if (item.value.description == "") "Element comments" else item.value.description,
+                                                color = Color.DarkGray,
+                                                fontSize = 20.sp
+                                            )
+                                        }
+                                        innerTextField()
                                     }
-                                    innerTextField()
-                                }
-                            )
+                                )
+                            }
+                        }
+
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                val newSpendingItem = SpendingItem(
+                                    id = item.value.id,
+                                    imageResourceId = item.value.imageResourceId,
+                                    description = sumUser.value,
+                                    reason = item.value.reason,
+                                    sum = item.value.sum,
+                                    time = item.value.time,
+                                    transaction = item.value.transaction
+                                )
+                                addNewItem(newSpendingItem)
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                        ) {
+                            Text("Add")
                         }
                     }
 
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            val newSpendingItem = SpendingItem(
-                                id = item.value.id,
-                                imageResourceId = item.value.imageResourceId,
-                                description = sumUser.value,
-                                reason = item.value.reason,
-                                sum = item.value.sum,
-                                time = item.value.time,
-                                transaction = item.value.transaction
-                            )
-                            addNewItem(newSpendingItem)
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                    ) {
-                        Text("Add")
-                    }
                 }
             }
         }
