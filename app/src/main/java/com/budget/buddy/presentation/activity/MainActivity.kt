@@ -27,7 +27,10 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
@@ -55,7 +59,9 @@ import com.budget.buddy.presentation.ui.additem.BottomSheetComponent
 import com.budget.buddy.presentation.ui.additem.EditItem
 import com.budget.buddy.presentation.ui.card.CardCashTransaction
 import com.budget.buddy.presentation.ui.list.ItemsList
+import com.budget.buddy.presentation.ui.menu.history.HistoryCard
 import com.budget.buddy.presentation.view.MainViewModel
+import com.budget.buddy.presentation.view.history.PieChart
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,7 +79,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxSize()
                     .background(color = Color(R.color.background))
             ) {
-                MonthlyCheck()
+                HistoryCard()
             }
         }
     }
@@ -144,6 +150,8 @@ class MainActivity : ComponentActivity() {
         val balanceAll by viewModel.liveBalance.observeAsState()
         var editShow = remember { mutableStateOf(false) }
         val newSpendingItem = remember { mutableStateOf(SpendingItem()) }
+        var showMenu = remember { mutableStateOf(false) } // State to control menu visibility
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -168,14 +176,36 @@ class MainActivity : ComponentActivity() {
                                 Font(R.font.open)
                             )
                         )
-                        Icon(
-                            tint = Color.White,
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Menu",
-                            modifier = Modifier
-                                .size(50.dp)
-                                .padding(10.dp)
-                        )
+                        // IconButton used for triggering the menu
+                        IconButton(
+                            onClick = { showMenu.value = true }
+                        ) {
+                            Icon(
+                                tint = Color.White,
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Menu",
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .padding(10.dp)
+                            )
+                        }
+                        // Adjusted DropdownMenu
+                        DropdownMenu(
+                            expanded = showMenu.value,
+                            onDismissRequest = { showMenu.value = false },
+                            offset = DpOffset((-85).dp, 0.dp),  // Adjust the X offset to align the menu to the right
+                            modifier = Modifier.wrapContentSize(Alignment.TopEnd) // Align the menu contents to the end
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("History and analytics") },
+                                onClick = {
+                                    showMenu.value = false
+
+                                })
+                            DropdownMenuItem(
+                                text = { Text("Recommendations") },
+                                onClick = { showMenu.value = false })
+                        }
                     }
                 }
                 CardCashTransaction(

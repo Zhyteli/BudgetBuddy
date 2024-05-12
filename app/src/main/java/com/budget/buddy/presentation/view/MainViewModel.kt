@@ -273,7 +273,10 @@ class MainViewModel @Inject constructor(
 
             // Update live data values
             _spentAll.value = parsedTotalSpent
-            _liveBalance.value = mainUserDataMouth.balance + parsedTotalSpent
+            val allLive = mainUserDataMouth.balance + parsedTotalSpent
+            val formattedAllLive = numberFormat.format(allLive)
+            val parsedAllLive = numberFormat.parse(formattedAllLive)?.toDouble() ?: 0.0
+            _liveBalance.value = parsedAllLive
         }
     }
 
