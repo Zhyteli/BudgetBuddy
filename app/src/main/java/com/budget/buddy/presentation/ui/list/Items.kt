@@ -31,6 +31,7 @@ fun ItemCard(
         sum = 100.0,
         time = 0
     ),
+    color: Color = Color(R.color.surface)
 ) {
     Card(
         modifier = Modifier
@@ -41,7 +42,7 @@ fun ItemCard(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(R.color.surface))
+                .background(color)
         ) {
             Text(
                 text = item.imageResourceId,
@@ -52,7 +53,7 @@ fun ItemCard(
             Text(
                 text = item.reason,
                 fontSize = 14.sp,
-                color = Color.White,
+                color = if (color == Color(R.color.surface)) Color.White else Color.Black,
                 fontFamily = FontFamily(Font(R.font.open)),
                 modifier = Modifier.weight(1f)
             )
@@ -60,7 +61,7 @@ fun ItemCard(
                 text = "%.2f".format(item.sum),
                 fontSize = 14.sp,
                 textAlign = TextAlign.End,
-                color = Color.White,
+                color = if (color == Color(R.color.surface)) Color.White else Color.Black,
                 fontFamily = FontFamily(Font(R.font.open)),
                 modifier = Modifier.padding(end = 50.dp)
             )

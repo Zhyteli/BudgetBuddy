@@ -1,5 +1,6 @@
 package com.budget.buddy.presentation.view.history
 
+import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -32,23 +33,26 @@ import com.budget.buddy.R
 
 @Composable
 fun BarChart(
-    data: Map<String, Int> = mapOf(
-        "Sample-1" to 15000,
-        "Sample-2" to 12000,
-        "Sample-3" to 11000,
+    data: Map<String, Double> = mapOf(
+        "Sample-1" to 15000.0,
+        "Sample-2" to 12000.0,
+        "Sample-3" to 11000.0,
     ),
     chartBarWidth: Dp = 35.dp,
     animDuration: Int = 1000
 ) {
     val maxValue = data.values.maxOrNull() ?: 0  // Maximum value for scaling
-    val animateHeights = remember { mutableStateListOf<Dp>().also { list ->
-        data.forEach { list.add(0.dp) } // Initialize with 0.dp for animation
-    }}
+    val animateHeights = remember {
+        mutableStateListOf<Dp>().also { list ->
+            data.forEach { list.add(0.dp) } // Initialize with 0.dp for animation
+        }
+    }
     val colors = listOf(Color(0xFFBB86FC), Color(0xFF4CAF50), Color(0xFFF44336))
 
     LaunchedEffect(key1 = "barChart") {
         data.values.forEachIndexed { index, value ->
-            val targetHeight = (value.toFloat() / maxValue) * 300.dp  // Scale factor of 300dp
+            val targetHeight = ((value / maxValue.toInt()) * 300.dp) / 70  // Scale factor of 300dp
+            Log.d("TIME_", "targetHeight: $targetHeight")
             animateHeights[index] = targetHeight
         }
     }
@@ -78,7 +82,7 @@ fun BarChart(
                 Box(
                     modifier = Modifier
                         .width(chartBarWidth)
-                        .height(height / 2)
+                        .height(height / 3)
                         .background(colors[index % colors.size])
                 )
                 Text(

@@ -152,7 +152,7 @@ class MainViewModel @Inject constructor(
 
     fun testTime(): String {
         val calendarFrom = Calendar.getInstance()
-        calendarFrom.set(Calendar.MONTH, Calendar.APRIL)
+        calendarFrom.set(Calendar.MONTH, Calendar.MAY)
         calendarFrom.set(Calendar.DAY_OF_MONTH, 1)
         calendarFrom.set(Calendar.HOUR_OF_DAY, 0)
         calendarFrom.set(Calendar.MINUTE, 0)
@@ -188,7 +188,7 @@ class MainViewModel @Inject constructor(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = apiService.getUserData(from = testTime(), to = testTime2())
+                val response = apiService.getUserData(from = testTime(), to = toUnixTime)
                 if (response.isSuccessful) {
                     val userData: Array<UsersBankDetails>? = response.body()
                     userData?.let { array ->
