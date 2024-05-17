@@ -2,10 +2,13 @@ package com.budget.buddy.di.module
 
 import android.content.Context
 import androidx.room.Room
+import com.budget.buddy.data.database.AiAnalysisDao
 import com.budget.buddy.data.database.AppDatabase
 import com.budget.buddy.data.database.CashTransactionDao
 import com.budget.buddy.data.database.MainUserDataMouthDao
 import com.budget.buddy.data.database.TimeDao
+import com.budget.buddy.data.impl.AiAnalysisRepositoryImpl
+import com.budget.buddy.domain.cash.repository.AiAnalysisRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,5 +42,13 @@ object DataBaseModule {
     @Provides
     fun provideTimeDao(database: AppDatabase): TimeDao =
         database.timeDao()
+
+    @Provides
+    fun provideAiAnalysis(database: AppDatabase): AiAnalysisDao =
+        database.aiAnalysisDao()
+
+    @Provides
+    fun provideAiAnalysisRepository(aiDao: AiAnalysisDao): AiAnalysisRepository =
+        AiAnalysisRepositoryImpl(aiDao)
 
 }

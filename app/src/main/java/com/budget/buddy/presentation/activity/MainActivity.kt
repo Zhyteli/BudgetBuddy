@@ -56,6 +56,7 @@ import com.budget.buddy.presentation.ui.additem.BottomSheetComponent
 import com.budget.buddy.presentation.ui.additem.EditItem
 import com.budget.buddy.presentation.ui.card.CardCashTransaction
 import com.budget.buddy.presentation.ui.list.ItemsList
+import com.budget.buddy.presentation.ui.menu.analysis.AnalysisCard
 import com.budget.buddy.presentation.ui.menu.history.HistoryCard
 import com.budget.buddy.presentation.view.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -147,8 +148,10 @@ class MainActivity : ComponentActivity() {
         val balanceAll by viewModel.liveBalance.observeAsState()
         var editShow = remember { mutableStateOf(false) }
         var historyShow = remember { mutableStateOf(false) }
+        var analysisShow = remember { mutableStateOf(false) }
         val newSpendingItem = remember { mutableStateOf(SpendingItem()) }
         var showMenu = remember { mutableStateOf(false) } // State to control menu visibility
+        val analysisAi by viewModel.livePromt.observeAsState()
 
         Box(
             modifier = Modifier
@@ -205,7 +208,11 @@ class MainActivity : ComponentActivity() {
                                 })
                             DropdownMenuItem(
                                 text = { Text("Recommendations") },
-                                onClick = { showMenu.value = false }
+                                onClick = {
+                                    showMenu.value = false
+                                    analysisShow.value = !analysisShow.value
+                                    viewModel.ai()
+                                }
                             )
                         }
                     }
@@ -280,6 +287,9 @@ class MainActivity : ComponentActivity() {
                 historyShow.value, onDismiss = { historyShow.value = false },
                 it
             )
+        }
+        analysisAi?.let {
+            AnalysisCard(analysisShow.value, onDismiss = { analysisShow.value = false }, it)
         }
 
     }

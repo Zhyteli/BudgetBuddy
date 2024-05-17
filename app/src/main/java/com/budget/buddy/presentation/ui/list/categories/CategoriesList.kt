@@ -1,6 +1,5 @@
 package com.budget.buddy.presentation.ui.list.categories
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items

@@ -5,11 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.budget.buddy.data.api.ai.analyzeTransactions
 import com.budget.buddy.data.api.mono.ApiService
 import com.budget.buddy.data.api.mono.error.ErrorMono
 import com.budget.buddy.data.database.getdata.UserDataState
 import com.budget.buddy.data.impl.WorkTime
+import com.budget.buddy.domain.ai.AiAnalysis
 import com.budget.buddy.domain.cash.CashTransaction
+import com.budget.buddy.domain.cash.repository.AiAnalysisRepository
 import com.budget.buddy.domain.cash.usecase.cashtransaction.AddCashTransactionUseCase
 import com.budget.buddy.domain.cash.usecase.cashtransaction.DeleteTransactionUseCase
 import com.budget.buddy.domain.cash.usecase.cashtransaction.DeleteTransactionsByIdsUseCase
@@ -49,7 +52,7 @@ class MainViewModel @Inject constructor(
     private val apiService: ApiService,
 
     private val loadDataMainUserDataMouthUseCase: LoadDataMainUserDataMouthUseCase,
-
+    private val aiAnalysisRepository: AiAnalysisRepository,
     private val time: WorkTime,
 ) : ViewModel() {
 
@@ -69,6 +72,10 @@ class MainViewModel @Inject constructor(
     private val _spentAll = MutableLiveData<Double>()
     val spentAll: LiveData<Double>
         get() = _spentAll
+
+    private val _livePromt = MutableLiveData<String>()
+    val livePromt: LiveData<String>
+        get() = _livePromt
 
     init {
         initialUserData()
@@ -137,6 +144,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun ai() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val transactions = getAllTransactionsUseCase()
+            val recommendations = transactions?.let { analyzeTransactions(it) }
+            if (recommendations != null) {
+                _livePromt.postValue(recommendations!!)
+            }
+        }
+    }
 
     private fun initialUserData() {
         viewModelScope.launch {

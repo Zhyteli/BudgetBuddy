@@ -1,6 +1,5 @@
 package com.budget.buddy.presentation.view.history
 
-import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -51,8 +49,7 @@ fun BarChart(
 
     LaunchedEffect(key1 = "barChart") {
         data.values.forEachIndexed { index, value ->
-            val targetHeight = ((value / maxValue.toInt()) * 300.dp) / 70  // Scale factor of 300dp
-            Log.d("TIME_", "targetHeight: $targetHeight")
+            val targetHeight = ((value / maxValue.toInt()) * 300.dp) / 3 // Scale factor of 300dp
             animateHeights[index] = targetHeight
         }
     }
