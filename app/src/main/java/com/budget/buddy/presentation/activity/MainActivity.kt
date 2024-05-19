@@ -211,7 +211,7 @@ class MainActivity : ComponentActivity() {
                                 onClick = {
                                     showMenu.value = false
                                     analysisShow.value = !analysisShow.value
-                                    viewModel.ai()
+                                    viewModel.ai(application = application)
                                 }
                             )
                         }
@@ -288,10 +288,7 @@ class MainActivity : ComponentActivity() {
                 it
             )
         }
-        analysisAi?.let {
-            AnalysisCard(analysisShow.value, onDismiss = { analysisShow.value = false }, it)
-        }
-
+        AnalysisCard(analysisShow.value, onDismiss = { analysisShow.value = false }, analysisAi)
     }
 
 }

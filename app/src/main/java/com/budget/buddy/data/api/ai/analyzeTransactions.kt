@@ -1,13 +1,16 @@
 package com.budget.buddy.data.api.ai
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import com.budget.buddy.domain.cash.CashTransaction
+import com.budget.buddy.domain.mapper.convert.getSystemLanguage
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-suspend fun analyzeTransactions(transactions: List<CashTransaction>): String {
-    val prompt = createPrompt(transactions)
+suspend fun analyzeTransactions(transactions: List<CashTransaction>, context: Context): String {
+    val prompt = createPrompt(transactions, context)
     val messages = listOf(
         Message(role = "system", content = "You are a financial assistant."),
         Message(role = "user", content = prompt)
@@ -15,7 +18,7 @@ suspend fun analyzeTransactions(transactions: List<CashTransaction>): String {
     val requestBody = ChatGPTRequestBody(
         model = "gpt-4-turbo", // Убедитесь, что используете поддерживаемую модель
         messages = messages,
-        max_tokens = 512,
+        max_tokens = 1000,
         temperature = 0.7
     )
 
@@ -39,7 +42,8 @@ suspend fun analyzeTransactions(transactions: List<CashTransaction>): String {
         val response = service.analyze(apiKey, requestBody)
         if (response.isSuccessful) {
             val result =
-                response.body()?.choices?.firstOrNull()?.message?.content ?: "No recommendation"
+                response.body()?.choices?.firstOrNull()?.message?.content?.let { cleanText(it) }
+                    ?: "No recommendation"
             result
         } else {
             throw Exception("Failed to get response from OpenAI: ${response.errorBody()?.string()}")
@@ -50,7 +54,7 @@ suspend fun analyzeTransactions(transactions: List<CashTransaction>): String {
 
 }
 
-fun createPrompt(transactions: List<CashTransaction>): String {
+fun createPrompt(transactions: List<CashTransaction>, context: Context): String {
     val transactionDetails = transactions.joinToString("\n") { transaction ->
         "Amount: ${transaction.amount}, Date: ${transaction.date}, Description: ${transaction.description}, Type: ${transaction.type}"
     }
@@ -58,6 +62,14 @@ fun createPrompt(transactions: List<CashTransaction>): String {
         Here are the user's transactions for the month:
         $transactionDetails
         
-        Based on this data, please provide financial recommendations to help the user manage their finances better.
+        Based on this data, please provide financial recommendations to help the user manage their finances better. Use ${
+        getSystemLanguage(
+            context
+        )
+    } language. max_tokens = 550
     """.trimIndent()
+}
+
+fun cleanText(text: String): String {
+    return text.replace("*", "") // Замените "*" на "" для удаления всех символов "*"
 }

@@ -1,6 +1,9 @@
 package com.budget.buddy.presentation.view
 
+import android.app.Application
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,6 +26,7 @@ import com.budget.buddy.domain.cash.usecase.cashtransaction.UpdateTransactionsUs
 import com.budget.buddy.domain.cash.usecase.maindatauser.LoadDataMainUserDataMouthUseCase
 import com.budget.buddy.domain.items.SpendingItem
 import com.budget.buddy.domain.mapper.MapperCategoriesItemForNumber
+import com.budget.buddy.domain.mapper.convert.ConvertTime
 import com.budget.buddy.domain.mono.UsersBankDetails
 import com.budget.buddy.domain.user.MainUserDataMouth
 import com.budget.buddy.domain.user.Time
@@ -35,6 +39,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
@@ -144,10 +149,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun ai() {
+    fun ai(application: Application) {
         viewModelScope.launch(Dispatchers.IO) {
-            val transactions = getAllTransactionsUseCase()
-            val recommendations = transactions?.let { analyzeTransactions(it) }
+            var currentMonth = LocalDate.now().withDayOfMonth(1)
+            val transactions = getAllTransactionsUseCase()?.filter {
+                ConvertTime.convertTimestampToDate(it.date)
+                    .contains(currentMonth.monthValue.toString())
+            }
+            val recommendations = transactions?.let { analyzeTransactions(it, application) }
             if (recommendations != null) {
                 _livePromt.postValue(recommendations!!)
             }
