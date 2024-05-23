@@ -210,45 +210,54 @@ class MainViewModel @Inject constructor(
 
     fun getMonoData(
         callbackError: (String) -> Unit = {},
+        application: Application
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = apiService.getUserData(from = testTime(), to = toUnixTime)
-                if (response.isSuccessful) {
-                    val userData: Array<UsersBankDetails>? = response.body()
-                    userData?.let { array ->
-                        val uniqueTransactions = array.distinctBy { it.id }
+                val sharedPreferences = application.getSharedPreferences("mono", 0)
+                if (sharedPreferences.contains("key_mono")) {
+                    val response = apiService.getUserData(
+                        from = testTime(),
+                        to = toUnixTime,
+                        token = sharedPreferences.getString("key_mono", "") ?: ""
+                    )
+                    if (response.isSuccessful) {
+                        val userData: Array<UsersBankDetails>? = response.body()
+                        userData?.let { array ->
+                            val uniqueTransactions = array.distinctBy { it.id }
 
-                        uniqueTransactions.forEach { bankTransaction ->
-                            // Check if the transaction already exists in the database
-                            val existingTransaction = getTransactionByIdUseCase(bankTransaction.id)
+                            uniqueTransactions.forEach { bankTransaction ->
+                                // Check if the transaction already exists in the database
+                                val existingTransaction =
+                                    getTransactionByIdUseCase(bankTransaction.id)
 
-                            if (existingTransaction == null) {
-                                // Transaction doesn't exist, save it
-                                val transaction = CashTransaction(
-                                    amount = bankTransaction.amount / 100.0,
-                                    date = bankTransaction.time,
-                                    description = bankTransaction.description,
-                                    descriptionFull = bankTransaction.description,
-                                    type = bankTransaction.mcc / 100,
-                                    transaction = (bankTransaction.amount / 100.0) > 0
-                                )
-                                Log.d("TEST_FUL_TR", "Transaction: $bankTransaction")
-                                saveAddCashTransactionUseCase(transaction)
+                                if (existingTransaction == null) {
+                                    // Transaction doesn't exist, save it
+                                    val transaction = CashTransaction(
+                                        amount = bankTransaction.amount / 100.0,
+                                        date = bankTransaction.time,
+                                        description = bankTransaction.description,
+                                        descriptionFull = bankTransaction.description,
+                                        type = bankTransaction.mcc / 100,
+                                        transaction = (bankTransaction.amount / 100.0) > 0
+                                    )
+                                    Log.d("TEST_FUL_TR", "Transaction: $bankTransaction")
+                                    saveAddCashTransactionUseCase(transaction)
 //                                spendingCounter(loadDataMainUserDataMouthUseCase() ?: MainUserDataMouth())
+                                }
                             }
-                        }
-                        checkingAvailabilityDataFromBank()
-                    }
-                } else {
-                    val error = response.errorBody()?.string().toString()
-                    val json = JSONObject(error)
-                    if (json.has("errorDescription")) {
-                        if (json.getString("errorDescription") != ErrorMono.ErrorDescription.error) {
-                            callbackError(json.getString("error"))
+                            checkingAvailabilityDataFromBank()
                         }
                     } else {
-                        callbackError(error)
+                        val error = response.errorBody()?.string().toString()
+                        val json = JSONObject(error)
+                        if (json.has("errorDescription")) {
+                            if (json.getString("errorDescription") != ErrorMono.ErrorDescription.error) {
+                                callbackError(json.getString("error"))
+                            }
+                        } else {
+                            callbackError(error)
+                        }
                     }
                 }
             } catch (e: Exception) {

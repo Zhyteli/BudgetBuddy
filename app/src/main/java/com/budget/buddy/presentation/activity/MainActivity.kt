@@ -7,6 +7,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +28,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -126,7 +133,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun getBankData() {
-        viewModel.getMonoData(callbackError = {
+        viewModel.getMonoData(application = application, callbackError = {
             lifecycleScope.launch(Dispatchers.Main) {
                 Log.d("TEST_", "onCreate: ${it}")
                 Toast.makeText(this@MainActivity, it, Toast.LENGTH_LONG).show()
@@ -168,18 +175,20 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxWidth(), // Ensure the Row uses the full width
                         horizontalArrangement = Arrangement.SpaceBetween // Arrange children to start and end
                     ) {
-                        Text(
-                            text = monthlyBudget.name,
-                            fontSize = 20.sp,
-                            modifier = Modifier.padding(10.dp),
-                            color = Color.White,
-                            fontFamily = FontFamily(
-                                Font(R.font.open)
+                        if (!showMenu.value) {
+                            Text(
+                                text = monthlyBudget.name,
+                                fontSize = 20.sp,
+                                modifier = Modifier.padding(10.dp),
+                                color = Color.White,
+                                fontFamily = FontFamily(
+                                    Font(R.font.open)
+                                )
                             )
-                        )
+                        }
                         // IconButton used for triggering the menu
                         IconButton(
-                            onClick = { showMenu.value = true }
+                            onClick = { showMenu.value = !showMenu.value }
                         ) {
                             Icon(
                                 tint = Color.White,
@@ -190,30 +199,68 @@ class MainActivity : ComponentActivity() {
                                     .padding(10.dp)
                             )
                         }
-                        // Adjusted DropdownMenu
-                        DropdownMenu(
-                            expanded = showMenu.value,
-                            onDismissRequest = { showMenu.value = false },
-                            offset = DpOffset(
-                                (-85).dp,
-                                0.dp
-                            ),  // Adjust the X offset to align the menu to the right
-                            modifier = Modifier.wrapContentSize(Alignment.TopEnd) // Align the menu contents to the end
+
+                        AnimatedVisibility(
+                            visible = showMenu.value,
+                            enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
+                            exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("History and analytics") },
-                                onClick = {
-                                    showMenu.value = false
-                                    historyShow.value = !historyShow.value
-                                })
-                            DropdownMenuItem(
-                                text = { Text("Recommendations") },
-                                onClick = {
-                                    showMenu.value = false
-                                    analysisShow.value = !analysisShow.value
-                                    viewModel.ai(application = application)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Button(
+                                    onClick = {
+                                        showMenu.value = false
+                                        historyShow.value = !historyShow.value
+                                    },
+                                    modifier = Modifier
+                                        .wrapContentSize(Alignment.Center),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                                ) {
+                                    Text(
+                                        text = "History",
+                                        color = Color.White,
+                                        fontFamily = FontFamily(Font(R.font.open))
+                                    )
                                 }
-                            )
+                                Button(
+                                    onClick = {
+                                        showMenu.value = false
+                                        analysisShow.value = !analysisShow.value
+                                        viewModel.ai(application = application)
+                                    },
+                                    modifier = Modifier
+                                        .wrapContentSize(Alignment.Center),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                                ) {
+                                    Text(
+                                        text = "Recommendations",
+                                        color = Color.White,
+                                        fontFamily = FontFamily(Font(R.font.open))
+                                    )
+                                }
+                                Button(
+                                    onClick = {
+                                        showMenu.value = false
+                                        startActivity(
+                                            Intent(
+                                                this@MainActivity,
+                                                WebActivity::class.java
+                                            )
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .wrapContentSize(Alignment.Center),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                                ) {
+                                    Text(
+                                        text = "Bank",
+                                        color = Color.White,
+                                        fontFamily = FontFamily(Font(R.font.open))
+                                    )
+                                }
+                            }
                         }
                     }
                 }

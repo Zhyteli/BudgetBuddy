@@ -1,6 +1,7 @@
 package com.budget.buddy.presentation.ui.start
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,7 +72,11 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
             }
         )
     }
-
+    Box(
+        modifier = Modifier
+            .background(Color(R.color.background))
+            .fillMaxSize()
+    )
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -87,6 +94,8 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                 Text(
                     text = stringResource(R.string.new_budget),
                     fontSize = 30.sp,
+                    fontFamily = FontFamily(Font(R.font.open)),
+                    color = Color.White,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 Button(
@@ -103,15 +112,20 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                             color.value = Color.Red
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(R.color.surface)),
                     modifier = Modifier
                         .padding(end = 10.dp)
                 ) {
-                    Text(text = stringResource(R.string.save_data))
+                    Text(
+                        text = stringResource(R.string.save_data),
+                        fontFamily = FontFamily(Font(R.font.open))
+                    )
                 }
             }
             Text(
                 text = stringResource(R.string.description_of_the_beginning),
+                fontFamily = FontFamily(Font(R.font.open)),
+                color = Color(R.color.secondary_text),
                 modifier = Modifier.padding(horizontal = 10.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -125,7 +139,7 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                     defaultElevation = 10.dp
                 ),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.Gray
+                    containerColor = Color.Black
                 )
             ) {
                 Column(
@@ -147,6 +161,7 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                         Text(
                             text = currency.value,
                             fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.open)),
                             color = Color.White,
                             modifier = Modifier.clickable { showDialog = true }
                         )
@@ -157,11 +172,11 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                 }
             }
             Image(
-                painter = painterResource(id = R.drawable.start_cop),
+                painter = painterResource(id = R.drawable.dug),
                 contentDescription = "start pig",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
+                    .padding(top = 100.dp)
             )
         }
     }
@@ -184,13 +199,14 @@ fun CurrencyDialog(
         Card(
             shape = RoundedCornerShape(8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = Color(R.color.background)
             )
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 currencyList.forEach { currency ->
                     Text(
                         text = currency,
+                        fontFamily = FontFamily(Font(R.font.open)),
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
@@ -198,7 +214,8 @@ fun CurrencyDialog(
                                 onDismissRequest()
                             }
                             .padding(8.dp),
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = Color.White
                     )
                 }
             }
@@ -221,6 +238,7 @@ fun TextEdit(
                 Text(
                     stringResource(textLabel),
                     color = color,
+                    fontFamily = FontFamily(Font(R.font.open)),
                     fontSize = 20.sp
                 )
             }
