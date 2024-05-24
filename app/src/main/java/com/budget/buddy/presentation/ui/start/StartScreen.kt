@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -42,6 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.budget.buddy.R
 import com.budget.buddy.domain.user.MainUserDataMouth
+import com.budget.buddy.presentation.ui.anim.AnimatedPreloader
+import com.budget.buddy.presentation.ui.them.Colors
 
 @Preview
 @Composable
@@ -74,7 +77,7 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
     }
     Box(
         modifier = Modifier
-            .background(Color(R.color.background))
+            .background(Colors.Background)
             .fillMaxSize()
     )
     Box(
@@ -95,7 +98,7 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                     text = stringResource(R.string.new_budget),
                     fontSize = 30.sp,
                     fontFamily = FontFamily(Font(R.font.open)),
-                    color = Color.White,
+                    color = Color.White, // High-contrast text color
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 Button(
@@ -109,23 +112,24 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                                 )
                             )
                         } else {
-                            color.value = Color.Red
+                            color.value = Colors.Error // Bright error color
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(R.color.surface)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Colors.Surface), // Slightly lighter than background
                     modifier = Modifier
                         .padding(end = 10.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.save_data),
-                        fontFamily = FontFamily(Font(R.font.open))
+                        fontFamily = FontFamily(Font(R.font.open)),
+                        color = Color.White // High-contrast button text
                     )
                 }
             }
             Text(
                 text = stringResource(R.string.description_of_the_beginning),
                 fontFamily = FontFamily(Font(R.font.open)),
-                color = Color(R.color.secondary_text),
+                color = Color.Gray, // Slightly lighter for secondary text
                 modifier = Modifier.padding(horizontal = 10.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -139,7 +143,7 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                     defaultElevation = 10.dp
                 ),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.Black
+                    containerColor = Colors.Surface // Slightly lighter card background
                 )
             ) {
                 Column(
@@ -156,7 +160,7 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                         Text(
                             text = stringResource(R.string.currency),
                             fontSize = 20.sp,
-                            color = Color.White
+                            color = Color.Gray // Secondary text color
                         )
                         Text(
                             text = currency.value,
@@ -171,12 +175,12 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
                     TextEdit(textAmountOfMoney, R.string.amount_of_money, color.value, true)
                 }
             }
-            Image(
-                painter = painterResource(id = R.drawable.dug),
-                contentDescription = "start pig",
+            Spacer(modifier = Modifier.height(100.dp))
+            AnimatedPreloader(
+                raw = R.raw.anm,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 100.dp)
+                    .size(250.dp)
+                    .align(Alignment.CenterHorizontally)
             )
         }
     }
@@ -199,7 +203,7 @@ fun CurrencyDialog(
         Card(
             shape = RoundedCornerShape(8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(R.color.background)
+                containerColor = Color(0xFF121212) // Dialog background
             )
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
@@ -215,7 +219,7 @@ fun CurrencyDialog(
                             }
                             .padding(8.dp),
                         fontSize = 20.sp,
-                        color = Color.White
+                        color = Color.White // High-contrast text
                     )
                 }
             }
@@ -227,7 +231,7 @@ fun CurrencyDialog(
 fun TextEdit(
     text: MutableState<String> = mutableStateOf(""),
     textLabel: Int = R.string.name,
-    color: Color = Color.DarkGray,
+    color: Color = Color.Gray, // Secondary text color
     numberBord: Boolean = false,
 ) {
     BasicTextField(
@@ -246,12 +250,12 @@ fun TextEdit(
         },
         singleLine = true,
         textStyle = TextStyle(
-            color = Color.White,
+            color = Color.White, // High-contrast input text
             fontSize = 20.sp
         ),
         keyboardOptions = KeyboardOptions(
             keyboardType = if (numberBord) KeyboardType.Number else KeyboardType.Text
-        )
-
+        ),
+        modifier = Modifier.padding(4.dp) // Add padding for better readability
     )
 }

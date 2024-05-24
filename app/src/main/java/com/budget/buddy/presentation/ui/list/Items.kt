@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.budget.buddy.R
 import com.budget.buddy.domain.items.SpendingItem
 import com.budget.buddy.presentation.ui.categories.CategoryIcons
+import com.budget.buddy.presentation.ui.them.Colors
 
 @Preview
 @Composable
@@ -31,18 +33,20 @@ fun ItemCard(
         sum = 100.0,
         time = 0
     ),
-    color: Color = Color(R.color.surface)
+    color: Color = Colors.Surface
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 15.dp, vertical = 3.dp)
+            .padding(horizontal = 15.dp, vertical = 3.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = color // Slightly lighter card background
+        )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color)
         ) {
             Text(
                 text = item.imageResourceId,
@@ -53,7 +57,7 @@ fun ItemCard(
             Text(
                 text = item.reason,
                 fontSize = 14.sp,
-                color = if (color == Color(R.color.surface)) Color.White else Color.Black,
+                color = if (color == Colors.Surface) Color.White else Color.Black,
                 fontFamily = FontFamily(Font(R.font.open)),
                 modifier = Modifier.weight(1f)
             )
@@ -61,7 +65,7 @@ fun ItemCard(
                 text = "%.2f".format(item.sum),
                 fontSize = 14.sp,
                 textAlign = TextAlign.End,
-                color = if (color == Color(R.color.surface)) Color.White else Color.Black,
+                color = if (color == Colors.Surface) Color.White else Color.Black,
                 fontFamily = FontFamily(Font(R.font.open)),
                 modifier = Modifier.padding(end = 50.dp)
             )

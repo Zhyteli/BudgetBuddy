@@ -2,7 +2,8 @@
 <resources>
 
     <style name="Theme.BudgetBuddy" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/surface</item>
-        <item name="android:navigationBarColor">@color/surface</item>
+<!--        <item name="android:statusBarColor">@color/surface</item>-->
+<!--        <item name="android:navigationBarColor">@color/surface</item>-->
+<!--        <item name="android:windowSplashScreenBackground">@color/</item>-->
     </style>
 </resources>

@@ -2,6 +2,7 @@
 
 package com.budget.buddy.presentation.ui.menu.history
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -39,8 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +53,7 @@ import com.budget.buddy.data.impl.work.SumAllCategories
 import com.budget.buddy.domain.items.SpendingItem
 import com.budget.buddy.domain.mapper.convert.ConvertTime
 import com.budget.buddy.presentation.ui.list.categories.CategoriesList
+import com.budget.buddy.presentation.ui.them.Colors
 import com.budget.buddy.presentation.view.history.BarChart
 import com.budget.buddy.presentation.view.history.PieChart
 import kotlinx.coroutines.launch
@@ -76,6 +81,12 @@ fun HistoryCard(
     var currentMonth by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
     var offsetX by remember { mutableStateOf(0f) }
     val coroutineScope = rememberCoroutineScope()
+    var flipped by remember { mutableStateOf(false) }
+    val MrotationY by animateFloatAsState(
+        targetValue = if (flipped) 180f else 0f,
+        animationSpec = tween(durationMillis = 1000) // Adjust the duration to reduce the turning speed
+    )
+    val density = LocalDensity.current.density
 
     val animatedOffsetX by animateDpAsState(
         targetValue = offsetX.dp,
@@ -139,20 +150,22 @@ fun HistoryCard(
                     .fillMaxSize()
                     .padding(top = 20.dp)
                     .offset(x = animatedOffsetX)
-                    .graphicsLayer {
+                    .graphicsLayer(
+                        rotationY = MrotationY,
                         cameraDistance = 12f * density
-                    }
+                    )
                     .animateContentSize(),
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Colors.Background // Slightly lighter card background
+                )
             ) {
-                Box(
-                    Modifier
-                        .background(Color(R.color.background))
-                        .fillMaxSize()
-                ) {
+                if (MrotationY <= 90f || MrotationY >= 270f) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .graphicsLayer { rotationY = 0f },
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
@@ -160,7 +173,14 @@ fun HistoryCard(
                             text = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
                             fontFamily = FontFamily(Font(R.font.open)),
                             fontSize = 30.sp,
-                            color = Color.Black
+                            color = Color.White
+                        )
+                        Text(
+                            text = stringResource(R.string.expenses),
+                            fontFamily = FontFamily(Font(R.font.open)),
+                            fontSize = 30.sp,
+                            color = Color.White,
+                            modifier = Modifier.clickable { flipped = !flipped }
                         )
 
                         Spacer(modifier = Modifier.size(30.dp))
@@ -181,14 +201,17 @@ fun HistoryCard(
                         Spacer(modifier = Modifier.size(30.dp))
                         val lastMonth = SumAllCategories.sumAllCategoriesList(itemList.filter {
                             ConvertTime.convertTimestampToDate(it.time)
-                                .contains(currentMonth.minusMonths(1).monthValue.toString())
+                                .contains(currentMonth.minusMonths(1).monthValue.toString()) &&
+                                    it.sum < 0
                         })
                         val secondMouth =
                             SumAllCategories.sumAllCategoriesList(itemList.filter {
                                 ConvertTime.convertTimestampToDate(it.time)
-                                    .contains(currentMonth.plusMonths(1).monthValue.toString())
+                                    .contains(currentMonth.plusMonths(1).monthValue.toString()) &&
+                                        it.sum < 0
                             })
                         val nowCategory = SumAllCategories.sumAllCategoriesList(listNow)
+
                         val last = if (lastMonth.values.sum() == 0.0) {
                             1.0
                         } else {
@@ -231,6 +254,87 @@ fun HistoryCard(
                             currentMonth.monthValue.toString()
                         )
                     }
+
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .graphicsLayer { rotationY = 180f },
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Text(
+                            text = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+                            fontFamily = FontFamily(Font(R.font.open)),
+                            fontSize = 30.sp,
+                            color = Color.White
+                        )
+                        Text(
+                            text = stringResource(R.string.revenue),
+                            fontFamily = FontFamily(Font(R.font.open)),
+                            fontSize = 30.sp,
+                            color = Color.White,
+                            modifier = Modifier.clickable { flipped = !flipped }
+                        )
+
+                        Spacer(modifier = Modifier.size(30.dp))
+                        val listNow =
+                            itemList.filter {
+                                ConvertTime.convertTimestampToDate(it.time)
+                                    .contains(currentMonth.monthValue.toString()) &&
+                                        it.sum > 0
+                            }
+                        Box(
+                            modifier = Modifier
+                                .size(150.dp)
+                        ) {
+                            PieChart(
+                                data = SumAllCategories.sumAllPositiveCategoriesList(listNow),
+                                item = listNow
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(30.dp))
+                        val lastMonth =
+                            SumAllCategories.sumAllPositiveCategoriesList(itemList.filter {
+                                ConvertTime.convertTimestampToDate(it.time)
+                                    .contains(currentMonth.minusMonths(1).monthValue.toString())
+                            })
+                        val secondMouth =
+                            SumAllCategories.sumAllPositiveCategoriesList(itemList.filter {
+                                ConvertTime.convertTimestampToDate(it.time)
+                                    .contains(currentMonth.plusMonths(1).monthValue.toString())
+                            })
+                        val nowCategory = SumAllCategories.sumAllPositiveCategoriesList(listNow)
+
+                        val last = if (lastMonth.values.sum() == 0.0) {
+                            1000.0
+                        } else {
+                            lastMonth.values.sum()
+                        }
+                        val now = if (nowCategory.values.sum() == 0.0) {
+                            1000.0
+                        } else {
+                            nowCategory.values.sum()
+                        }
+                        val second = if (secondMouth.values.sum() == 0.0) {
+                            1000.0
+                        } else {
+                            secondMouth.values.sum()
+                        }
+                        val map = mapOf(
+                            currentMonth.minusMonths(1)
+                                .format(DateTimeFormatter.ofPattern("MMMM")) to last,
+                            currentMonth.format(DateTimeFormatter.ofPattern("MMMM")) to now,
+                            currentMonth.plusMonths(1)
+                                .format(DateTimeFormatter.ofPattern("MMMM")) to second
+                        )
+                        VertikalColumns(map, onDismiss)
+                        CategoriesList(
+                            itemList,
+                            Color(R.color.black),
+                            currentMonth.monthValue.toString()
+                        )
+                    }
                 }
             }
         }
@@ -248,28 +352,27 @@ private fun VertikalColumns(
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Colors.Surface // Slightly lighter card background
+        )
     ) {
-        Box(modifier = Modifier.background(Color(R.color.black))) {
-            Box(modifier = Modifier.background(Color(R.color.black))) {
-                Column {
-                    BarChart(data = map)
-                    Button(
-                        onClick = {
-                            onDismiss()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                    ) {
-                        Text(
-                            text = "Back",
-                            color = Color.White,
-                            fontFamily = FontFamily(Font(R.font.open))
-                        )
-                    }
-                }
+        Column {
+            BarChart(data = map)
+            Button(
+                onClick = {
+                    onDismiss()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Colors.Background)
+            ) {
+                Text(
+                    text = "Back",
+                    color = Color.White,
+                    fontFamily = FontFamily(Font(R.font.open))
+                )
             }
         }
     }

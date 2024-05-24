@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.budget.buddy.R
 import com.budget.buddy.domain.items.SpendingItem
+import com.budget.buddy.presentation.ui.them.Colors
 
 @Preview
 @Composable
@@ -106,7 +107,7 @@ fun EditItem(
                 elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
             ) {
                 Box(Modifier
-                    .background(Color(R.color.background))
+                    .background(Colors.Background)
                     .height(500.dp)
                 ){
                     Column(

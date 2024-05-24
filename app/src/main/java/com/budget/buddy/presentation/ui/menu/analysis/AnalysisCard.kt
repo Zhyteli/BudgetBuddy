@@ -39,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.budget.buddy.R
+import com.budget.buddy.presentation.ui.anim.AnimatedPreloader
+import com.budget.buddy.presentation.ui.them.Colors
 
 @Preview
 @Composable
@@ -94,7 +96,7 @@ fun AnalysisCard(
             ) {
                 Box(
                     Modifier
-                        .background(Color(R.color.background))
+                        .background(Colors.Background)
                         .fillMaxSize()
                 ) {
                     val scrollState = rememberScrollState()
@@ -146,11 +148,7 @@ fun LoadingAnimation() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CircularProgressIndicator(
-                color = Color.Gray,
-                strokeWidth = 4.dp,
-                modifier = Modifier.size(64.dp)
-            )
+            AnimatedPreloader(raw = R.raw.andliz, modifier = Modifier.size(150.dp))
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Analyzing data...",

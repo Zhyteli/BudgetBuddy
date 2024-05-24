@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.budget.buddy.R
+import com.budget.buddy.presentation.ui.them.Colors
 
 class WebActivity : ComponentActivity() {
     private var shared: SharedPreferences? = null
@@ -64,9 +65,7 @@ class WebActivity : ComponentActivity() {
             modifier = androidx.compose.ui.Modifier
                 .fillMaxSize()
                 .background(
-                    Color(
-                        R.color.background
-                    )
+                    Colors.Background
                 ),
             contentAlignment = androidx.compose.ui.Alignment.Center,
         ) {

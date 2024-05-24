@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.budget.buddy.R
+import com.budget.buddy.presentation.ui.them.Colors
 
 @Preview
 @Composable
@@ -37,11 +38,13 @@ fun CategoriesItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier.clickable(onClick = {
             onClick(item)
-        })
+        }),
+        colors = CardDefaults.cardColors(
+            containerColor = Colors.Surface // Slightly lighter card background
+        )
     ) {
         Box(
             Modifier
-                .background(Color(R.color.surface))
                 .wrapContentSize()) {
             Row(
                 modifier = Modifier

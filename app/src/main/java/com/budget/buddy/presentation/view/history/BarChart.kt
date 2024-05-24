@@ -72,7 +72,7 @@ fun BarChart(
                 Text(
                     text = "${entry.value}",
                     fontSize = 16.sp,
-                    color = Color.Black,
+                    color = Color.Gray,
                     fontFamily = FontFamily(Font(R.font.open)),
                     modifier = Modifier.padding(bottom = 4.dp)
                 )

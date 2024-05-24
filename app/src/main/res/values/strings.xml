@@ -16,4 +16,6 @@
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="title_activity_web">WebActivity</string>
+    <string name="expenses">Expenses</string>
+    <string name="revenue">Revenue</string>
 </resources>

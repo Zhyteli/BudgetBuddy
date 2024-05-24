@@ -58,7 +58,9 @@ import com.budget.buddy.presentation.ui.categories.CategoriesItem
 import com.budget.buddy.presentation.ui.categories.CategoriesItemData
 import com.budget.buddy.presentation.ui.categories.CategoryIcons
 import com.budget.buddy.presentation.ui.categories.listScrol
+import com.budget.buddy.presentation.ui.them.Colors
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun BottomSheetComponent(
@@ -66,9 +68,8 @@ fun BottomSheetComponent(
     onDismiss: () -> Unit = {},
     addNewItem: (SpendingItem) -> Unit = {},
 ) {
-    val animationDuration = 600 // Duration for the bottom sheet slide animation
-    val overlayStartDelay =
-        animationDuration / 2 // Start the overlay animation halfway through the bottom sheet animation
+    val animationDuration = 600
+    val overlayStartDelay = animationDuration / 2
     var transaction by remember { mutableStateOf(false) }
     var categoryIcons by remember {
         mutableStateOf(
@@ -80,12 +81,11 @@ fun BottomSheetComponent(
     }
     val sumUser = remember { mutableStateOf("") }
 
-    // State for controlling the overlay opacity
     val overlayAlpha by animateFloatAsState(
         targetValue = if (isVisible) 0.8f else 0f,
         animationSpec = tween(
             durationMillis = animationDuration,
-            delayMillis = overlayStartDelay // Delay before starting the alpha animation
+            delayMillis = overlayStartDelay
         )
     )
 
@@ -101,11 +101,9 @@ fun BottomSheetComponent(
         )
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
         ) {
-            // Smoothly animated overlay
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -117,17 +115,17 @@ fun BottomSheetComponent(
                     )
             )
 
-            // Bottom Sheet Content
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(500.dp),
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+                colors = CardDefaults.cardColors(containerColor = Colors.Background)
             ) {
                 Box(
                     Modifier
-                        .background(Color(R.color.background))
+                        .background(Color(0xFF121212))
                         .height(500.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -153,7 +151,11 @@ fun BottomSheetComponent(
                                         )
                                     }
                                 },
-                                colors = FilterChipDefaults.filterChipColors(Color(R.color.on_primary)),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = Color.White,
+                                    selectedLabelColor = Color.Black,
+
+                                ),
                                 selected = selected,
                                 leadingIcon = if (selected) {
                                     {
@@ -178,7 +180,7 @@ fun BottomSheetComponent(
                                         if (sumUser.value.isEmpty()) {
                                             Text(
                                                 "0",
-                                                color = Color.DarkGray,
+                                                color = Color.Gray,
                                                 fontSize = 30.sp,
                                                 fontFamily = FontFamily(
                                                     Font(R.font.open)
@@ -188,7 +190,7 @@ fun BottomSheetComponent(
                                         innerTextField()
                                     },
                                     singleLine = true,
-                                    textStyle = TextStyle(color = Color.Black, fontSize = 30.sp),
+                                    textStyle = TextStyle(color = Color.White, fontSize = 30.sp),
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                                 )
                             }
@@ -216,9 +218,9 @@ fun BottomSheetComponent(
                                     )
                                 )
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                            colors = ButtonDefaults.buttonColors(containerColor = Colors.Surface)
                         ) {
-                            Text("Add")
+                            Text("Add", color = Color.White)
                         }
                     }
                 }

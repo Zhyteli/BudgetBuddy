@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.budget.buddy.R
 import com.budget.buddy.domain.items.SpendingItem
+import com.budget.buddy.presentation.ui.them.Colors
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -54,17 +56,19 @@ fun ItemsList(
 
 @Composable
 fun HeaderItem(header: String) {
-    Card(Modifier.padding(horizontal = 15.dp, vertical = 10.dp)) {
-        Box(Modifier.background(Color(R.color.on_primary))) {
-            Text(
-                text = header,
-                color = Color.White,
-                fontFamily = FontFamily(Font(R.font.open)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-            )
-        }
+    Card(
+        Modifier.padding(horizontal = 15.dp, vertical = 10.dp), colors = CardDefaults.cardColors(
+            containerColor = Colors.Surface // Slightly lighter card background
+        )
+    ) {
+        Text(
+            text = header,
+            color = Color.White,
+            fontFamily = FontFamily(Font(R.font.open)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+        )
     }
 }
 

@@ -44,7 +44,6 @@ fun CardCashTransaction(
     spent: Double = 0.0,
     balance: Double = 0.0
 ) {
-    // Creating an infinite transition for the shimmer effect
     val infiniteTransition = rememberInfiniteTransition()
     val translateAnim by infiniteTransition.animateFloat(
         initialValue = 300f,
@@ -52,23 +51,23 @@ fun CardCashTransaction(
         animationSpec = infiniteRepeatable(
             animation = tween(
                 durationMillis = 5000,
-                easing = LinearEasing // Ensures a smooth linear animation
+                easing = LinearEasing
             ),
-            repeatMode = RepeatMode.Reverse // Reverses the animation on each iteration
+            repeatMode = RepeatMode.Reverse
         ), label = ""
     )
 
-    // Adjusting the gradient dynamically based on the animation value
     val pearlGradient = Brush.linearGradient(
         colors = listOf(
-            Color(0xFF565c68),  // Darker shade of beige
-            Color(0xFF5E7587),  // Darker shade of light blue
-            Color(0xFF7A6B7A),  // Darker shade of thistle
-            Color(0xFF565c68)
+            Color(0xFF1E1E1E),  // Dark Gray
+            Color(0xFF3C3F41),  // Medium Gray
+            Color(0xFF4F5356),  // Lighter Gray with a hint of blue
+            Color(0xFF1E1E1E)   // Dark Gray again for a smooth transition
         ),
         start = Offset(0f, 0f),
-        end = Offset(translateAnim, translateAnim) // Shimmer effect
+        end = Offset(translateAnim, translateAnim)
     )
+
 
     Card(
         modifier = Modifier

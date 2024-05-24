@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -32,8 +34,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -48,15 +48,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import com.budget.buddy.R
 import com.budget.buddy.data.database.getdata.UserDataState
-import com.budget.buddy.data.impl.work.SumAllCategories
 import com.budget.buddy.domain.items.SpendingItem
 import com.budget.buddy.domain.user.MainUserDataMouth
 import com.budget.buddy.presentation.ui.additem.BottomSheetComponent
@@ -65,6 +66,7 @@ import com.budget.buddy.presentation.ui.card.CardCashTransaction
 import com.budget.buddy.presentation.ui.list.ItemsList
 import com.budget.buddy.presentation.ui.menu.analysis.AnalysisCard
 import com.budget.buddy.presentation.ui.menu.history.HistoryCard
+import com.budget.buddy.presentation.ui.them.Colors
 import com.budget.buddy.presentation.view.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -78,16 +80,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color(R.color.background))
-            ) {
-                MonthlyCheck()
-            }
+            MonthlyCheck()
         }
     }
-
     @Composable
     private fun MainActivity.MonthlyCheck() {
         val resultInitialUserData by viewModel.userData.collectAsState()
@@ -113,7 +108,7 @@ class MainActivity : ComponentActivity() {
                             Log.d("TEST_", "Cash: ${it}")
                             getBankData()
                         }
-                        MainSkrin(it, mainUserDataMouth, resultMono = resultMono)
+                        MainScreen(it, mainUserDataMouth, resultMono = resultMono)
                     }
                     viewModel.spendingCounter(mainUserDataMouth)
                 } else {
@@ -142,7 +137,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun MainSkrin(
+    private fun MainScreen(
         value: MutableList<SpendingItem>? = null,
         monthlyBudget: MainUserDataMouth = MainUserDataMouth(),
         resultMono: State<MutableList<SpendingItem>?>,
@@ -163,7 +158,7 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color(R.color.surface)),
+                .background(color = Colors.Background),
             contentAlignment = Alignment.TopCenter
         ) {
             Column {
