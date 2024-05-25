@@ -208,6 +208,7 @@ fun BottomSheetComponent(
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
+                                if(sumUser.value.isEmpty()) return@Button
                                 addNewItem(
                                     SpendingItem(
                                         imageResourceId = categoryIcons.icon,

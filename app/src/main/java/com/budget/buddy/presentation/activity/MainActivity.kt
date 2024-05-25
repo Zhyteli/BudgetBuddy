@@ -3,9 +3,11 @@ package com.budget.buddy.presentation.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -79,10 +82,18 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Hide the nav bar and status bar
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_FULLSCREEN
+                        // Enable sticky immersive mode
+                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         setContent {
             MonthlyCheck()
         }
     }
+
     @Composable
     private fun MainActivity.MonthlyCheck() {
         val resultInitialUserData by viewModel.userData.collectAsState()
@@ -158,104 +169,89 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Colors.Background),
-            contentAlignment = Alignment.TopCenter
+                .background(color = Colors.Background)
         ) {
             Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = monthlyBudget.name,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(10.dp),
+                        color = Color.White,
+                        fontFamily = FontFamily(Font(R.font.open))
+                    )
+                    IconButton(
+                        onClick = { showMenu.value = !showMenu.value }
+                    ) {
+                        Icon(
+                            tint = Color.White,
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Menu",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
+                AnimatedVisibility(
+                    visible = showMenu.value,
+                    enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
+                    exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(), // Ensure the Row uses the full width
-                        horizontalArrangement = Arrangement.SpaceBetween // Arrange children to start and end
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                     ) {
-                        if (!showMenu.value) {
+                        Button(
+                            onClick = {
+                                showMenu.value = false
+                                historyShow.value = !historyShow.value
+                            },
+                            modifier = Modifier.wrapContentSize(Alignment.Center),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                        ) {
                             Text(
-                                text = monthlyBudget.name,
-                                fontSize = 20.sp,
-                                modifier = Modifier.padding(10.dp),
+                                text = "History",
                                 color = Color.White,
-                                fontFamily = FontFamily(
-                                    Font(R.font.open)
+                                fontFamily = FontFamily(Font(R.font.open))
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                showMenu.value = false
+                                analysisShow.value = !analysisShow.value
+                                viewModel.ai(application = application)
+                            },
+                            modifier = Modifier.wrapContentSize(Alignment.Center),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                        ) {
+                            Text(
+                                text = "Recommendations",
+                                color = Color.White,
+                                fontFamily = FontFamily(Font(R.font.open))
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                showMenu.value = false
+                                startActivity(
+                                    Intent(
+                                        this@MainActivity,
+                                        WebActivity::class.java
+                                    )
                                 )
-                            )
-                        }
-                        // IconButton used for triggering the menu
-                        IconButton(
-                            onClick = { showMenu.value = !showMenu.value }
+                            },
+                            modifier = Modifier.wrapContentSize(Alignment.Center),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                         ) {
-                            Icon(
-                                tint = Color.White,
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "Menu",
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .padding(10.dp)
+                            Text(
+                                text = "Bank",
+                                color = Color.White,
+                                fontFamily = FontFamily(Font(R.font.open))
                             )
-                        }
-
-                        AnimatedVisibility(
-                            visible = showMenu.value,
-                            enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
-                            exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                Button(
-                                    onClick = {
-                                        showMenu.value = false
-                                        historyShow.value = !historyShow.value
-                                    },
-                                    modifier = Modifier
-                                        .wrapContentSize(Alignment.Center),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                                ) {
-                                    Text(
-                                        text = "History",
-                                        color = Color.White,
-                                        fontFamily = FontFamily(Font(R.font.open))
-                                    )
-                                }
-                                Button(
-                                    onClick = {
-                                        showMenu.value = false
-                                        analysisShow.value = !analysisShow.value
-                                        viewModel.ai(application = application)
-                                    },
-                                    modifier = Modifier
-                                        .wrapContentSize(Alignment.Center),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                                ) {
-                                    Text(
-                                        text = "Recommendations",
-                                        color = Color.White,
-                                        fontFamily = FontFamily(Font(R.font.open))
-                                    )
-                                }
-                                Button(
-                                    onClick = {
-                                        showMenu.value = false
-                                        startActivity(
-                                            Intent(
-                                                this@MainActivity,
-                                                WebActivity::class.java
-                                            )
-                                        )
-                                    },
-                                    modifier = Modifier
-                                        .wrapContentSize(Alignment.Center),
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                                ) {
-                                    Text(
-                                        text = "Bank",
-                                        color = Color.White,
-                                        fontFamily = FontFamily(Font(R.font.open))
-                                    )
-                                }
-                            }
                         }
                     }
                 }
@@ -264,20 +260,21 @@ class MainActivity : ComponentActivity() {
                     spent = spentAll ?: spent,
                     balance = balanceAll ?: balance
                 )
-                // Update ViewModel's spending items
                 value?.let { viewModel.updateSpendingItems(it) }
-
                 if (spendingItems.isNotEmpty()) {
                     Log.d("TEST_ItemsList", spendingItems.toString())
-                    ItemsList(items = spendingItems, onDelete = {
-                        viewModel.deleteSpendingItem(it)
-                    }, onEdit = {
-                        newSpendingItem.value = it
-                        editShow.value = !editShow.value
-                    })
+                    ItemsList(
+                        items = spendingItems,
+                        onDelete = { viewModel.deleteSpendingItem(it) },
+                        onEdit = {
+                            newSpendingItem.value = it
+                            editShow.value = !editShow.value
+                        }
+                    )
                 }
             }
         }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()

@@ -18,4 +18,5 @@
     <string name="title_activity_web">WebActivity</string>
     <string name="expenses">Expenses</string>
     <string name="revenue">Revenue</string>
+    <string name="you_already_logged_in">You already logged in</string>
 </resources>

@@ -92,46 +92,44 @@ fun AnalysisCard(
                     .padding(top = 20.dp)
                     .animateContentSize(),
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Colors.Background // Slightly lighter card background
+                )
             ) {
-                Box(
-                    Modifier
-                        .background(Colors.Background)
-                        .fillMaxSize()
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .verticalScroll(scrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val scrollState = rememberScrollState()
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .verticalScroll(scrollState),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
 //                        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.analysis))
 //                        val progress by animateLottieCompositionAsState(composition)
 //                        LottieAnimation(
 //                            composition = composition,
 //                            progress = { progress },
 //                        )
-                        MaterialTheme {
-                            AnalysisScreen(analysis = analysis) // Pass actual analysis data when available
-                        }
-                        Button(
-                            onClick = {
-                                onDismiss()
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                        ) {
-                            Text(
-                                text = "Back",
-                                color = Color.White,
-                                fontFamily = FontFamily(Font(R.font.open))
-                            )
-                        }
+                    MaterialTheme {
+                        AnalysisScreen(analysis = analysis) // Pass actual analysis data when available
+                    }
+                    Button(
+                        onClick = {
+                            onDismiss()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Colors.Surface)
+                    ) {
+                        Text(
+                            text = "Back",
+                            color = Color.White,
+                            fontFamily = FontFamily(Font(R.font.open))
+                        )
                     }
                 }
+
             }
         }
     }

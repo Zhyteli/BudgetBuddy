@@ -99,12 +99,12 @@ fun HistoryCard(
     val gestureModifier = Modifier.pointerInput(Unit) {
         detectHorizontalDragGestures(
             onDragEnd = {
-                if (offsetX > 0) { // Swipe to the right
+                if (offsetX < 0) { // Swipe to the right
                     coroutineScope.launch {
                         offsetX = 0f
                         currentMonth = currentMonth.plusMonths(1)
                     }
-                } else if (offsetX < 0) { // Swipe to the left
+                } else if (offsetX > 0) { // Swipe to the left
                     coroutineScope.launch {
                         offsetX = 0f
                         currentMonth = currentMonth.minusMonths(1)
@@ -249,7 +249,7 @@ fun HistoryCard(
                         )
                         VertikalColumns(map, onDismiss)
                         CategoriesList(
-                            itemList,
+                            itemList.filter { it.sum < 0 },
                             Color(R.color.black),
                             currentMonth.monthValue.toString()
                         )
@@ -330,7 +330,7 @@ fun HistoryCard(
                         )
                         VertikalColumns(map, onDismiss)
                         CategoriesList(
-                            itemList,
+                            itemList.filter { it.sum > 0 },
                             Color(R.color.black),
                             currentMonth.monthValue.toString()
                         )

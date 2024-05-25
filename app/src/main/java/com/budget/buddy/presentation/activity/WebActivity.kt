@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -31,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,13 +40,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.budget.buddy.R
+import com.budget.buddy.presentation.ui.anim.AnimatedPreloader
 import com.budget.buddy.presentation.ui.them.Colors
 
 class WebActivity : ComponentActivity() {
     private var shared: SharedPreferences? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Hide the nav bar and status bar
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_FULLSCREEN
+                        // Enable sticky immersive mode
+                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         setContent {
             shared = getSharedPreferences("mono", MODE_PRIVATE)
             if (shared?.contains("key_mono") == false) {
@@ -70,14 +79,14 @@ class WebActivity : ComponentActivity() {
             contentAlignment = androidx.compose.ui.Alignment.Center,
         ) {
             Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                AnimatedPreloader(Modifier.size(200.dp), R.raw.cool)
+                Spacer(modifier = Modifier.size(10.dp))
                 Text(
-                    text = "You already logged in",
+                    text = stringResource(R.string.you_already_logged_in),
                     color = Color.White,
                     fontFamily = FontFamily(Font(R.font.open)),
                     fontSize = 24.sp
                 )
-                Text(text = "\uD83D\uDE0E", fontSize = 60.sp)
-                Spacer(modifier = Modifier.size(10.dp))
                 Button(
                     onClick = {
                         onBackPressedDispatcher.onBackPressed()
@@ -85,7 +94,7 @@ class WebActivity : ComponentActivity() {
                     modifier = Modifier
                         .width(200.dp)
                         .padding(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                    colors = ButtonDefaults.buttonColors(containerColor = Colors.Surface)
                 ) {
                     Text(
                         text = "Back",
@@ -158,9 +167,12 @@ class WebActivity : ComponentActivity() {
                             ) { value ->
                                 value?.let {
                                     Log.d("TEST_WEB", "Element ID: $it")
-                                    shared?.edit()?.putString("key_mono", "u_cJh6ZmPkcZonYBaZnz85q-1Cuwrdn5qlYaGUpR7De4")?.apply()
+                                    shared?.edit()?.putString(
+                                        "key_mono",
+                                        "u_cJh6ZmPkcZonYBaZnz85q-1Cuwrdn5qlYaGUpR7De4"
+                                    )?.apply()
                                     if (it != "null") {
-                                    }else{
+                                    } else {
                                         chek(view)
                                     }
                                 }
