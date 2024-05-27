@@ -2,7 +2,6 @@
 
 package com.budget.buddy.presentation.ui.menu.history
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -44,7 +43,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -369,7 +367,7 @@ private fun VertikalColumns(
                 colors = ButtonDefaults.buttonColors(containerColor = Colors.Background)
             ) {
                 Text(
-                    text = "Back",
+                    text = stringResource(R.string.back),
                     color = Color.White,
                     fontFamily = FontFamily(Font(R.font.open))
                 )

@@ -15,4 +15,8 @@ class MainUserDataMouthRepositoryImpl @Inject constructor(
     override suspend fun loadDataMainUserDataMouth(): MainUserDataMouth{
         return mainUserDataMouthDao.loadDataMainUserDataMouth()
     }
+
+    override suspend fun deleteDataMainUserDataMouth() {
+        mainUserDataMouthDao.deleteDataMainUserDataMouth()
+    }
 }

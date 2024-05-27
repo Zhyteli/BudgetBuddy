@@ -41,6 +41,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,18 +54,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.splashscreen.SplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.budget.buddy.R
 import com.budget.buddy.data.database.getdata.UserDataState
 import com.budget.buddy.domain.items.SpendingItem
+import com.budget.buddy.domain.mapper.convert.ConvertTime
 import com.budget.buddy.domain.user.MainUserDataMouth
 import com.budget.buddy.presentation.ui.additem.BottomSheetComponent
 import com.budget.buddy.presentation.ui.additem.EditItem
+import com.budget.buddy.presentation.ui.anim.AnimatedPreloader
 import com.budget.buddy.presentation.ui.card.CardCashTransaction
 import com.budget.buddy.presentation.ui.list.ItemsList
 import com.budget.buddy.presentation.ui.menu.analysis.AnalysisCard
@@ -73,7 +78,10 @@ import com.budget.buddy.presentation.ui.them.Colors
 import com.budget.buddy.presentation.view.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -90,7 +98,37 @@ class MainActivity : ComponentActivity() {
                         // Enable sticky immersive mode
                         or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         setContent {
-            MonthlyCheck()
+            SplashScreen {
+                MonthlyCheck()
+            }
+        }
+    }
+
+    @Composable
+    fun SplashScreen(main: @Composable () -> Unit) {
+        val show = remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            delay(1000)
+            show.value = true
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Colors.Background)
+        ) {
+            if (!show.value) {
+                AnimatedPreloader(
+                    raw = R.raw.anm,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .align(Alignment.Center)
+                )
+            } else {
+                Box(modifier = Modifier.align(Alignment.Center)) {
+                    main()
+                }
+            }
         }
     }
 
@@ -165,6 +203,7 @@ class MainActivity : ComponentActivity() {
         val newSpendingItem = remember { mutableStateOf(SpendingItem()) }
         var showMenu = remember { mutableStateOf(false) } // State to control menu visibility
         val analysisAi by viewModel.livePromt.observeAsState()
+        var currentMonth by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
 
         Box(
             modifier = Modifier
@@ -203,7 +242,9 @@ class MainActivity : ComponentActivity() {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     ) {
                         Button(
                             onClick = {
@@ -214,7 +255,7 @@ class MainActivity : ComponentActivity() {
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                         ) {
                             Text(
-                                text = "History",
+                                text = stringResource(R.string.history),
                                 color = Color.White,
                                 fontFamily = FontFamily(Font(R.font.open))
                             )
@@ -229,7 +270,7 @@ class MainActivity : ComponentActivity() {
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                         ) {
                             Text(
-                                text = "Recommendations",
+                                text = stringResource(R.string.recommendations),
                                 color = Color.White,
                                 fontFamily = FontFamily(Font(R.font.open))
                             )
@@ -248,7 +289,26 @@ class MainActivity : ComponentActivity() {
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                         ) {
                             Text(
-                                text = "Bank",
+                                text = stringResource(R.string.bank),
+                                color = Color.White,
+                                fontFamily = FontFamily(Font(R.font.open))
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                showMenu.value = false
+                                startActivity(
+                                    Intent(
+                                        this@MainActivity,
+                                        StartActivity::class.java
+                                    )
+                                )
+                            },
+                            modifier = Modifier.wrapContentSize(Alignment.Center),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.new_),
                                 color = Color.White,
                                 fontFamily = FontFamily(Font(R.font.open))
                             )
@@ -264,7 +324,9 @@ class MainActivity : ComponentActivity() {
                 if (spendingItems.isNotEmpty()) {
                     Log.d("TEST_ItemsList", spendingItems.toString())
                     ItemsList(
-                        items = spendingItems,
+                        items = spendingItems.filter {
+                            ConvertTime.convertTimestampToDate(it.time) == currentMonth.monthValue.toString()
+                        },
                         onDelete = { viewModel.deleteSpendingItem(it) },
                         onEdit = {
                             newSpendingItem.value = it

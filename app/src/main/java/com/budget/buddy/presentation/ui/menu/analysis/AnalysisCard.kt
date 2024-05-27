@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -123,7 +124,7 @@ fun AnalysisCard(
                         colors = ButtonDefaults.buttonColors(containerColor = Colors.Surface)
                     ) {
                         Text(
-                            text = "Back",
+                            text = stringResource(id = R.string.back),
                             color = Color.White,
                             fontFamily = FontFamily(Font(R.font.open))
                         )
@@ -149,7 +150,7 @@ fun LoadingAnimation() {
             AnimatedPreloader(raw = R.raw.andliz, modifier = Modifier.size(150.dp))
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Analyzing data...",
+                text = stringResource(R.string.analyzing_data),
                 fontFamily = FontFamily(Font(R.font.open)),
                 fontSize = 20.sp,
                 color = Color.Gray

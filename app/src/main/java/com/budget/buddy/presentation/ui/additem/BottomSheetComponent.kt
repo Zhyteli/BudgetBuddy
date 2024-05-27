@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -125,7 +126,6 @@ fun BottomSheetComponent(
             ) {
                 Box(
                     Modifier
-                        .background(Color(0xFF121212))
                         .height(500.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -137,14 +137,16 @@ fun BottomSheetComponent(
                                 label = {
                                     if (selected) {
                                         Text(
-                                            "Income", color = Color.Black,
+                                            stringResource(R.string.income),
+                                            color = Color.Black,
                                             fontFamily = FontFamily(
                                                 Font(R.font.open)
                                             )
                                         )
                                     } else {
                                         Text(
-                                            "Costs", color = Color.White,
+                                            text = stringResource(R.string.costs),
+                                            color = Color.White,
                                             fontFamily = FontFamily(
                                                 Font(R.font.open)
                                             )
@@ -155,7 +157,7 @@ fun BottomSheetComponent(
                                     selectedContainerColor = Color.White,
                                     selectedLabelColor = Color.Black,
 
-                                ),
+                                    ),
                                 selected = selected,
                                 leadingIcon = if (selected) {
                                     {
@@ -208,7 +210,7 @@ fun BottomSheetComponent(
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                if(sumUser.value.isEmpty()) return@Button
+                                if (sumUser.value.isEmpty()) return@Button
                                 addNewItem(
                                     SpendingItem(
                                         imageResourceId = categoryIcons.icon,
@@ -221,7 +223,7 @@ fun BottomSheetComponent(
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Colors.Surface)
                         ) {
-                            Text("Add", color = Color.White)
+                            Text(stringResource(R.string.add), color = Color.White)
                         }
                     }
                 }

@@ -37,6 +37,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -104,11 +105,12 @@ fun EditItem(
                     .height(400.dp)
                     .imePadding(),
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+                colors = CardDefaults.cardColors(containerColor = Colors.Background)
             ) {
-                Box(Modifier
-                    .background(Colors.Background)
-                    .height(500.dp)
+                Box(
+                    Modifier
+                        .height(500.dp)
                 ){
                     Column(
                         modifier = Modifier
@@ -138,7 +140,7 @@ fun EditItem(
                                     decorationBox = { innerTextField ->
                                         if (sumUser.value.isEmpty()) {
                                             Text(
-                                                if (item.value.description == "") "Element comments" else item.value.description,
+                                                if (item.value.description == "") stringResource(R.string.element_comments) else item.value.description,
                                                 color = Color.DarkGray,
                                                 fontSize = 20.sp
                                             )
@@ -163,9 +165,9 @@ fun EditItem(
                                 )
                                 addNewItem(newSpendingItem)
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                            colors = ButtonDefaults.buttonColors(containerColor = Colors.Surface)
                         ) {
-                            Text("Add")
+                            Text(stringResource(R.string.add))
                         }
                     }
 

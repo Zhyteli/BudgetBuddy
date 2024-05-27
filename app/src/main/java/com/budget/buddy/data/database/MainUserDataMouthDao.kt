@@ -12,4 +12,6 @@ interface MainUserDataMouthDao {
     suspend fun saveDataMainUserDataMouth(mainUser:MainUserDataMouth)
     @Query("SELECT * FROM MainUserDataMouth")
     suspend fun loadDataMainUserDataMouth(): MainUserDataMouth
+    @Query("DELETE FROM MainUserDataMouth")
+    suspend fun deleteDataMainUserDataMouth()
 }

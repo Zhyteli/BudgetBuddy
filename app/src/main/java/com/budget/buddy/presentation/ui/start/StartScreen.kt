@@ -1,6 +1,5 @@
 package com.budget.buddy.presentation.ui.start
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -177,7 +175,7 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
             }
             Spacer(modifier = Modifier.height(100.dp))
             AnimatedPreloader(
-                raw = R.raw.anm,
+                raw = R.raw.hi,
                 modifier = Modifier
                     .size(250.dp)
                     .align(Alignment.CenterHorizontally)
@@ -190,12 +188,12 @@ fun StartScreen(saveDataUser: (MainUserDataMouth) -> Unit = {}) {
 @Composable
 fun CurrencyDialog(
     currencyList: List<String> = listOf(
-        "Ukrainian hryvnia",
-        "US Dollar",
-        "Euro",
-        "British Pound"
+        stringResource(id = R.string.ukrainian_hryvnia),
+        stringResource(id = R.string.us_dollar),
+        stringResource(id = R.string.euro),
+        stringResource(id = R.string.british_pound)
     ),
-    currencyU: MutableState<String> = mutableStateOf("Ukrainian hryvnia"),
+    currencyU: MutableState<String> = mutableStateOf(stringResource(id = R.string.ukrainian_hryvnia)),
     onDismissRequest: () -> Unit = {},
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {

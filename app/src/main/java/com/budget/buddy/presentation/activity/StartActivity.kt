@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.input.key.Key.Companion.U
 import androidx.lifecycle.lifecycleScope
+import com.budget.buddy.domain.cash.usecase.maindatauser.DeleteMainUserDataMouthUseCase
 import com.budget.buddy.domain.cash.usecase.maindatauser.LoadDataMainUserDataMouthUseCase
 import com.budget.buddy.domain.cash.usecase.maindatauser.SaveDataMainUserDataMouthUseCase
 import com.budget.buddy.domain.user.MainUserDataMouth
@@ -28,6 +29,9 @@ class StartActivity : ComponentActivity() {
     @Inject
     lateinit var loadDataMainUserDataMouthUseCase: LoadDataMainUserDataMouthUseCase
 
+    @Inject
+    lateinit var deleteMainUserDataMouthUseCase: DeleteMainUserDataMouthUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.decorView.systemUiVisibility = (
@@ -40,6 +44,7 @@ class StartActivity : ComponentActivity() {
         setContent {
             StartScreen {
                 lifecycleScope.launch {
+                    deleteMainUserDataMouthUseCase()
                     saveDataMainUserDataMouthUseCase(it)
                 }
                 startActivity(Intent(this, MainActivity::class.java))

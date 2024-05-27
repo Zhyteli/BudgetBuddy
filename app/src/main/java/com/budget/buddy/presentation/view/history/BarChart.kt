@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.budget.buddy.R
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun BarChart(
@@ -61,6 +63,8 @@ fun BarChart(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.Bottom
     ) {
+        val numberFormat = NumberFormat.getInstance(Locale.GERMANY)
+        numberFormat.maximumFractionDigits = 2
         data.entries.forEachIndexed { index, entry ->
             val height by animateDpAsState(
                 targetValue = animateHeights[index],
@@ -69,8 +73,9 @@ fun BarChart(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val formattedTotalSpent = numberFormat.format(entry.value)
                 Text(
-                    text = "${entry.value}",
+                    text = formattedTotalSpent,
                     fontSize = 16.sp,
                     color = Color.Gray,
                     fontFamily = FontFamily(Font(R.font.open)),

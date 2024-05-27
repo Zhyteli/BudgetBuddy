@@ -280,9 +280,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun spendingCounter(mainUserDataMouth: MainUserDataMouth) {
+        var currentMonth = LocalDate.now().withDayOfMonth(1)
         viewModelScope.launch {
             delay(1500)
-            val transactions = getAllTransactionsUseCase() ?: emptyList()
+            val transactions =
+                getAllTransactionsUseCase()?.filter {
+                    ConvertTime.convertTimestampToDate(it.date) == currentMonth.monthValue.toString()
+                }
+                    ?: emptyList()
             // Calculate spent amount only on transactions with negative amounts and not marked as 'transaction'
             val totalSpent: Double =
                 transactions.filter { !it.transaction }.sumOf { it.amount }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Budget Buddy</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="description_of_the_beginning">Введіть назву бюджету, суму, яку плануєте витрачати щомісяця, а також, за бажанням, можете вибрати валюту.</string>
+    <string name="save_data">Зберегти дані</string>
+    <string name="name">Ім\'я</string>
+    <string name="currency">Валюта</string>
+    <string name="amount_of_money">Ваш баланс</string>
+    <string name="ukrainian_hryvnia">Гривні</string>
+    <string name="us_dollar">Американський долар</string>
+    <string name="euro">Євро</string>
+    <string name="british_pound">Британський фунт</string>
+    <string name="monthly_balance">Місячний баланс</string>
+    <string name="new_budget">Новий бюджет</string>
+    <string name="add_new_transaction">Додати нову транзакцію</string>
+    <string name="today">Сьогодні</string>
+    <string name="yesterday">Вчора</string>
+    <string name="title_activity_web">WebActivity</string>
+    <string name="expenses">Витрати</string>
+    <string name="revenue">Дохід</string>
+    <string name="you_already_logged_in">Ви вже авторизувалися</string>
+    <string name="history">Історія</string>
+    <string name="recommendations">Ші</string>
+    <string name="bank">Банк</string>
+    <string name="back">Назад</string>
+    <string name="analyzing_data">Аналіз даних…</string>
+    <string name="no_items">Немає елементів</string>
+    <string name="shopping">Шопінг</string>
+    <string name="monthly_budget">Місячний бюджет</string>
+    <string name="spent">Витрачено</string>
+    <string name="balance">Баланс</string>
+    <string name="add">Додайти</string>
+    <string name="element_comments">Коментарі до транзакції</string>
+    <string name="income">Дохід</string>
+    <string name="costs">Витрати</string>
+    <string name="new_">Новий</string>
+</resources>

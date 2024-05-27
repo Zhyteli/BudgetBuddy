@@ -1,6 +1,5 @@
 package com.budget.buddy.presentation.ui.card
 
-
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -29,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -106,7 +106,9 @@ fun CardCashTransaction(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Monthly budget", fontSize = 20.sp, color = Color.White,
+                        text = stringResource(R.string.monthly_budget),
+                        fontSize = 20.sp,
+                        color = Color.White,
                         fontFamily = FontFamily(
                             Font(R.font.open)
                         )
@@ -126,7 +128,9 @@ fun CardCashTransaction(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Spent", fontSize = 20.sp, color = Color.White,
+                        text = stringResource(R.string.spent),
+                        fontSize = 20.sp,
+                        color = Color.White,
                         fontFamily = FontFamily(
                             Font(R.font.open)
                         )
@@ -146,7 +150,9 @@ fun CardCashTransaction(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Balance", fontSize = 32.sp, color = Color.White,
+                        text = stringResource(R.string.balance),
+                        fontSize = 32.sp,
+                        color = Color.White,
                         fontFamily = FontFamily(
                             Font(R.font.open)
                         )

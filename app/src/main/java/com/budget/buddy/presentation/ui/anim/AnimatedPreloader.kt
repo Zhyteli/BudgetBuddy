@@ -15,7 +15,6 @@ fun AnimatedPreloader(modifier: Modifier = Modifier, raw: Int) {
     val preloaderLottieComposition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(raw)
     )
-    Log.d("TEST_", preloaderLottieComposition.toString())
     val preloaderProgress by animateLottieCompositionAsState(
         preloaderLottieComposition,
         iterations = LottieConstants.IterateForever,

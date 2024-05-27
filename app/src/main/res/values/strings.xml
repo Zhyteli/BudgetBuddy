@@ -1,8 +1,7 @@
 <resources>
-    <string name="app_name">BudgetBuddy</string>
+    <string name="app_name">Budget Buddy</string>
     <string name="title_activity_start">StartActivity</string>
     <string name="description_of_the_beginning">Enter the name of the budget, the amount you are considering spending each month, and also, if desired, you can choose the currency and color of the card.</string>
-    <string name="save_data">Save data</string>
     <string name="name">Name</string>
     <string name="currency">Currency</string>
     <string name="amount_of_money">Your Balance</string>
@@ -17,6 +16,22 @@
     <string name="yesterday">Yesterday</string>
     <string name="title_activity_web">WebActivity</string>
     <string name="expenses">Expenses</string>
-    <string name="revenue">Revenue</string>
+    <string name="revenue">Income</string>
     <string name="you_already_logged_in">You already logged in</string>
+    <string name="history">History</string>
+    <string name="recommendations">Analytics</string>
+    <string name="bank">Bank</string>
+    <string name="back">Back</string>
+    <string name="analyzing_data">Analyzing data…</string>
+    <string name="no_items">No items</string>
+    <string name="shopping">Shopping</string>
+    <string name="monthly_budget">Monthly budget</string>
+    <string name="spent">Spent</string>
+    <string name="balance">Balance</string>
+    <string name="add">Add</string>
+    <string name="element_comments">Comments on the transaction</string>
+    <string name="income">Income</string>
+    <string name="costs">Expenses</string>
+    <string name="new_">New</string>
+    <string name="save_data">Save data</string>
 </resources>

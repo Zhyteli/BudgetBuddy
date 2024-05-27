@@ -3,6 +3,7 @@ package com.budget.buddy.di.module
 import com.budget.buddy.data.database.MainUserDataMouthDao
 import com.budget.buddy.data.impl.MainUserDataMouthRepositoryImpl
 import com.budget.buddy.domain.cash.repository.MainUserDataMouthRepository
+import com.budget.buddy.domain.cash.usecase.maindatauser.DeleteMainUserDataMouthUseCase
 import com.budget.buddy.domain.cash.usecase.maindatauser.LoadDataMainUserDataMouthUseCase
 import com.budget.buddy.domain.cash.usecase.maindatauser.SaveDataMainUserDataMouthUseCase
 import dagger.Module
@@ -37,5 +38,13 @@ object MainUserDataMouthModule {
         mainUserDataMouthRepository: MainUserDataMouthRepository
     ): LoadDataMainUserDataMouthUseCase {
         return LoadDataMainUserDataMouthUseCase(mainUserDataMouthRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDeleteMainUserDataMouthUseCase(
+        mainUserDataMouthRepository: MainUserDataMouthRepository
+    ): DeleteMainUserDataMouthUseCase {
+        return DeleteMainUserDataMouthUseCase(mainUserDataMouthRepository)
     }
 }
